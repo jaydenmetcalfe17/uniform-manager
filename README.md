@@ -1,2 +1,2 @@
-# uniform-tracker
+# uniform-manager
 Tracking sign-in and sign-out of uniforms
