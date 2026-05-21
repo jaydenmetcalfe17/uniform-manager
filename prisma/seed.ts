@@ -12,6 +12,12 @@ const employeeData: Prisma.EmployeeCreateInput[] = [
     }
 ];
 
+const itemData: Prisma.ItemCreateInput[] = [
+    {
+        details: "S raincoat",
+    }
+];
+
 async function main() {
     for (const e of employeeData) {
         await prisma.employee.create({ data: e });
