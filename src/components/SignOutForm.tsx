@@ -35,7 +35,7 @@ export default function SignOutForm() {
         value={itemId}
         onChange={(e) => setItemId(e.target.value)}
       />
-      <button onClick={handleSubmit}>Sign Out Item</button>
+      <button className="bg-blue-300" onClick={handleSubmit}>Sign Out Item</button>
     </div>
   )
 }
