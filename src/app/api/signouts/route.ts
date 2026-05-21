@@ -1,6 +1,7 @@
 // src/app/api/signouts/route.ts
 
-import { db } from "../../../lib/db";
+// import { db } from "../../../lib/db";
+import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 
 // GET all signOuts
