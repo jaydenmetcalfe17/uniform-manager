@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from "../src/generated/prisma/client";
+import { PrismaClient, Prisma } from "../src/generated/prisma";
 
 const prisma = new PrismaClient();
 
@@ -37,16 +37,24 @@ const catalogData: Prisma.CatalogCreateInput[] = [
 ];
 
 const itemData: Prisma.ItemCreateInput[] = [
-    {
-        catalog: "Red shell jacket",
-        size: "S",
-        code: "24888S19"
-    }
+  {
+    catalog: {
+      connect: { piece: "Red shell jacket" }  // connects to existing Catalog record
+    },
+    size: "S",
+    code: "24888S19"
+  }
 ];
 
 async function main() {
     for (const e of employeeData) {
         await prisma.employee.create({ data: e });
+    }
+    for (const c of catalogData) {
+        await prisma.catalog.create({ data: c });
+    }
+    for (const i of itemData) {
+        await prisma.item.create({ data: i });
     }
     console.log("Seeding done.");
 }
