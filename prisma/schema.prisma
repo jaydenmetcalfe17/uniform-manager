@@ -26,8 +26,21 @@ model Employee {
 
 model Item {
   id            Int         @id @default(autoincrement())
-  details       String
+  catalogId     Int                  
+  catalog       Catalog     @relation(fields: [catalogId], references: [id])
+  size          Size
+  code          String      @unique
   signOuts      SignOut[]
+}
+
+enum Size {
+  XS
+  S
+  M
+  L
+  XL
+  XXL
+  XXXL
 }
 
 model SignOut {
@@ -39,4 +52,10 @@ model SignOut {
   signedOutAt   DateTime    @default(now())
   returned      Boolean     @default(false)
   signedInAt    DateTime?
+}
+
+model Catalog {
+  id            Int         @id @default(autoincrement())
+  piece         String      @unique
+  items         Item[]
 }

@@ -12,9 +12,35 @@ const employeeData: Prisma.EmployeeCreateInput[] = [
     }
 ];
 
+const catalogData: Prisma.CatalogCreateInput[] = [
+    {
+        piece: "Black raincoat",
+    },
+    {
+        piece: "Regular snowpants",
+    },
+    {
+        piece: "Bib snowpants",
+    },
+    {
+        piece: "Black puffy midlayer jacket",
+    },
+    {
+        piece: "Red shell jacket",
+    },
+    {
+        piece: "Red insulated jacket",
+    },
+    {
+        piece: "Black shell jacket"
+    }
+];
+
 const itemData: Prisma.ItemCreateInput[] = [
     {
-        details: "S raincoat",
+        catalog: "Red shell jacket",
+        size: "S",
+        code: "24888S19"
     }
 ];
 
