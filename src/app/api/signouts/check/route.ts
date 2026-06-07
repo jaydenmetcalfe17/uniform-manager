@@ -13,13 +13,13 @@ export async function POST(request: Request) {
     },
     include: { 
       item: { 
-        include: { catalog: true }  
+        include: { catalogue: true }  
       } 
     }
   })
 
   const alreadySignedOut = activeSignOuts.map((s) => {
-    const piece = s.item.catalog.piece
+    const piece = s.item.catalogue.piece
     const size = s.item.size
     return `${piece} (${size})`
   })

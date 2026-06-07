@@ -4,13 +4,18 @@
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 
-// GET all signOuts
 export async function GET() {
-  const signOuts = await db.signOut.findMany()
+  const signOuts = await db.signOut.findMany({
+    include: {
+      employee: true,
+      item: {
+        include: { catalogue: true }
+      }
+    }
+  })
   return NextResponse.json(signOuts)
 }
 
-// POST a new signOut
 export async function POST(request: Request) {
   const body = await request.json()
   const signOut = await db.signOut.create({

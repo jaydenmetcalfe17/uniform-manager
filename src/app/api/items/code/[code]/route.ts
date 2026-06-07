@@ -1,6 +1,7 @@
 //api/items/code/[code]/route.ts
 
-import { db } from "../../../../../lib/db"
+// import { db } from "../../../../../lib/db"
+import { db } from "@/lib/db";
 import { NextResponse } from "next/server"
 
 export async function GET(
@@ -11,7 +12,7 @@ export async function GET(
 
   const item = await db.item.findUnique({
     where: { code: code },
-    include: { catalog: true },
+    include: { catalogue: true },
   })
 
   if (!item) {

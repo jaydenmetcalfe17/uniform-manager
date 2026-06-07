@@ -12,7 +12,7 @@ const employeeData: Prisma.EmployeeCreateInput[] = [
     }
 ];
 
-const catalogData: Prisma.CatalogCreateInput[] = [
+const catalogueData: Prisma.CatalogueCreateInput[] = [
     {
         piece: "Black raincoat",
     },
@@ -38,8 +38,8 @@ const catalogData: Prisma.CatalogCreateInput[] = [
 
 const itemData: Prisma.ItemCreateInput[] = [
   {
-    catalog: {
-      connect: { piece: "Red shell jacket" }  // connects to existing Catalog record
+    catalogue: {
+      connect: { piece: "Red shell jacket" }  // connects to existing Catalogue record
     },
     size: "S",
     code: "24888S19"
@@ -50,8 +50,8 @@ async function main() {
     for (const e of employeeData) {
         await prisma.employee.create({ data: e });
     }
-    for (const c of catalogData) {
-        await prisma.catalog.create({ data: c });
+    for (const c of catalogueData) {
+        await prisma.catalogue.create({ data: c });
     }
     for (const i of itemData) {
         await prisma.item.create({ data: i });

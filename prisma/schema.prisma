@@ -26,8 +26,8 @@ model Employee {
 
 model Item {
   id            Int         @id @default(autoincrement())
-  catalogId     Int                  
-  catalog       Catalog     @relation(fields: [catalogId], references: [id])
+  catalogueId     Int                  
+  catalogue       Catalogue     @relation(fields: [catalogueId], references: [id])
   size          Size
   code          String      @unique
   signOuts      SignOut[]
@@ -54,7 +54,7 @@ model SignOut {
   signedInAt    DateTime?
 }
 
-model Catalog {
+model Catalogue {
   id            Int         @id @default(autoincrement())
   piece         String      @unique
   items         Item[]

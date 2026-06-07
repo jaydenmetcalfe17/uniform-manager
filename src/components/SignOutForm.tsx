@@ -61,7 +61,7 @@ export default function SignOutForm() {
 
     // Check if item is already signed out in the database
     if (item.isSignedOut) {
-        setError(`"${item.catalog.piece} (${item.size})" is already signed out to someone. It must be returned before signing out again.`)
+        setError(`"${item.catalogue.piece} (${item.size})" is already signed out to someone. It must be returned before signing out again.`)
         setItemCode("")
         return
     }
@@ -72,7 +72,7 @@ export default function SignOutForm() {
         itemId: item.id,
         code: item.code,
         size: item.size,
-        piece: item.catalog.piece,
+        piece: item.catalogue.piece,
         },
     ])
     setItemCode("")
