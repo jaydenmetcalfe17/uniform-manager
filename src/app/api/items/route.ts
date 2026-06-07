@@ -14,7 +14,9 @@ export async function POST(request: Request) {
   const body = await request.json()
   const item = await db.item.create({
     data: {
-      details: body.details,
+      catalogId: body.catalogId,
+      size: body.size,
+      code: body.code,
     }
   })
   return NextResponse.json(item)
