@@ -9,14 +9,15 @@ export async function PUT(
 ) {
   const { id } = await params
   const body = await request.json()
+
   const signOut = await db.signOut.update({
     where: { id: Number(id) },
     data: {
-      employeeId: body.employeeId,
-      itemId: body.itemId,
-      returned: body.returned,
-      signedOutAt: body.signedOutAt ? new Date(body.signedOutAt) : undefined,
-      signedInAt: body.signedInAt ? new Date(body.signedInAt) : null,
+      ...(body.employeeId !== undefined && { employeeId: body.employeeId }),
+      ...(body.itemId !== undefined && { itemId: body.itemId }),
+      ...(body.returned !== undefined && { returned: body.returned }),
+      ...(body.signedOutAt !== undefined && { signedOutAt: new Date(body.signedOutAt) }),
+      ...(body.signedInAt !== undefined && { signedInAt: body.signedInAt ? new Date(body.signedInAt) : null }),
     }
   })
   return NextResponse.json(signOut)

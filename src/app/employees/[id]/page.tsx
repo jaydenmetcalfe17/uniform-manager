@@ -21,13 +21,31 @@ export default function EmployeeDetailPage() {
   const { id } = useParams()
   const [employee, setEmployee] = useState<EmployeeWithSignOuts | null>(null)
 
-  useEffect(() => {
-    async function fetchEmployee() {
-      const res = await fetch(`/api/employees/${id}`)
-      setEmployee(await res.json())
-    }
+  async function fetchEmployee() {
+    const res = await fetch(`/api/employees/${id}`)
+    setEmployee(await res.json())
+  }
+
+  useEffect(() => { fetchEmployee() }, [id])
+
+  async function handleSignIn(signOutId: number) {
+    if (!confirm("Mark this item as returned?")) return
+    await fetch(`/api/signouts/${signOutId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        returned: true,
+        signedInAt: new Date().toISOString(),
+      })
+    })
     fetchEmployee()
-  }, [id])
+  }
+
+  async function handleDelete(signOutId: number) {
+    if (!confirm("Are you sure you want to delete this sign out record?")) return
+    await fetch(`/api/signouts/${signOutId}`, { method: "DELETE" })
+    fetchEmployee()
+  }
 
   if (!employee) return <div className="p-8">Loading...</div>
 
@@ -62,6 +80,7 @@ export default function EmployeeDetailPage() {
                 <th className="border p-2 text-left">Size</th>
                 <th className="border p-2 text-left">Code</th>
                 <th className="border p-2 text-left">Signed Out</th>
+                <th className="border p-2 text-left"></th>
               </tr>
             </thead>
             <tbody>
@@ -71,6 +90,20 @@ export default function EmployeeDetailPage() {
                   <td className="border p-2">{s.item.size}</td>
                   <td className="border p-2">{s.item.code}</td>
                   <td className="border p-2">{formatDate(s.signedOutAt)}</td>
+                  <td className="border p-2 flex gap-2">
+                    <button
+                      onClick={() => handleSignIn(s.id)}
+                      className="text-green-600 text-sm"
+                    >
+                      Sign In
+                    </button>
+                    <button
+                      onClick={() => handleDelete(s.id)}
+                      className="text-red-500 text-sm"
+                    >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -92,6 +125,7 @@ export default function EmployeeDetailPage() {
                 <th className="border p-2 text-left">Code</th>
                 <th className="border p-2 text-left">Signed Out</th>
                 <th className="border p-2 text-left">Signed In</th>
+                <th className="border p-2 text-left"></th>
               </tr>
             </thead>
             <tbody>
@@ -102,6 +136,14 @@ export default function EmployeeDetailPage() {
                   <td className="border p-2">{s.item.code}</td>
                   <td className="border p-2">{formatDate(s.signedOutAt)}</td>
                   <td className="border p-2">{s.signedInAt ? formatDate(s.signedInAt) : "—"}</td>
+                  <td className="border p-2">
+                    <button
+                      onClick={() => handleDelete(s.id)}
+                      className="text-red-500 text-sm"
+                    >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

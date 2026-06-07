@@ -12,6 +12,7 @@ const emptyForm: ItemForm = { catalogueId: "", size: "", code: "" }
 export default function ItemsPage() {
   const [items, setItems] = useState<Item[]>([])
   const [catalogue, setCatalogue] = useState<CatalogueEntry[]>([])
+  const [search, setSearch] = useState("")
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState<ItemForm>(emptyForm)
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -28,6 +29,17 @@ export default function ItemsPage() {
   }
 
   useEffect(() => { fetchItems(); fetchCatalogue() }, [])
+
+  const filtered = items.filter((item) => {
+    const q = search.toLowerCase()
+    const signedOutBy = item.signOuts?.[0]?.employee
+    return (
+      item.code.toLowerCase().includes(q) ||
+      item.catalogue?.piece.toLowerCase().includes(q) ||
+      item.size.toLowerCase().includes(q) ||
+      (signedOutBy && `${signedOutBy.firstName} ${signedOutBy.lastName}`.toLowerCase().includes(q))
+    )
+  })
 
   function openAdd() {
     setForm(emptyForm)
@@ -84,12 +96,20 @@ export default function ItemsPage() {
 
   return (
     <div className="p-8">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Items</h1>
         <button onClick={openAdd} className="bg-blue-500 text-white px-4 py-2 rounded">
           + Add Item
         </button>
       </div>
+
+      <input
+        type="text"
+        placeholder="Search by code, piece, size, or employee..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="border rounded p-2 w-full mb-4"
+      />
 
       <table className="w-full border-collapse">
         <thead>
@@ -103,7 +123,7 @@ export default function ItemsPage() {
           </tr>
         </thead>
         <tbody>
-          {items.map((item) => {
+          {filtered.map((item) => {
             const activeSignOut = item.signOuts?.[0]
             return (
               <tr key={item.id} className="hover:bg-gray-50">
@@ -125,6 +145,10 @@ export default function ItemsPage() {
           })}
         </tbody>
       </table>
+
+      {filtered.length === 0 && (
+        <p className="text-gray-500 text-sm mt-4">No items found.</p>
+      )}
 
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

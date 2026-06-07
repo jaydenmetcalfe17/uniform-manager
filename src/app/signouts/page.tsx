@@ -17,6 +17,7 @@ export default function SignOutsPage() {
   const [signOuts, setSignOuts] = useState<SignOutWithDetails[]>([])
   const [employees, setEmployees] = useState<Employee[]>([])
   const [showAll, setShowAll] = useState(false)
+  const [search, setSearch] = useState("")
   const [showModal, setShowModal] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [form, setForm] = useState<SignOutForm>({
@@ -96,6 +97,15 @@ export default function SignOutsPage() {
 
   const filtered = signOuts
     .filter((s) => showAll || !s.returned)
+    .filter((s) => {
+      const q = search.toLowerCase()
+      return (
+        `${s.employee.firstName} ${s.employee.lastName}`.toLowerCase().includes(q) ||
+        s.item.catalogue.piece.toLowerCase().includes(q) ||
+        s.item.size.toLowerCase().includes(q) ||
+        s.item.code.toLowerCase().includes(q)
+      )
+    })
     .sort((a, b) => {
       const dateA = new Date(a.signedInAt ?? a.signedOutAt).getTime()
       const dateB = new Date(b.signedInAt ?? b.signedOutAt).getTime()
@@ -104,12 +114,20 @@ export default function SignOutsPage() {
 
   return (
     <div className="p-8">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Sign Outs</h1>
         <button onClick={() => setShowAll(!showAll)} className="border px-4 py-2 rounded text-sm">
-          {showAll ? "Show Signed Out Only" : "Show All"}
+          {showAll ? "Show Active Only" : "Show All"}
         </button>
       </div>
+
+      <input
+        type="text"
+        placeholder="Search by employee, item, size, or code..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="border rounded p-2 w-full mb-4"
+      />
 
       <table className="w-full border-collapse">
         <thead>
@@ -135,7 +153,7 @@ export default function SignOutsPage() {
               <td className="border p-2">{s.signedInAt ? formatDate(s.signedInAt) : "—"}</td>
               <td className="border p-2">
                 <span className={`text-sm font-medium ${s.returned ? "text-green-600" : "text-orange-500"}`}>
-                  {s.returned ? "Returned" : "Signed Out"}
+                  {s.returned ? "Returned" : "Active"}
                 </span>
               </td>
               <td className="border p-2 flex gap-2">

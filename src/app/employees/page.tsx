@@ -3,8 +3,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import type { Employee } from "@/types"
 import Link from "next/link"
+import type { Employee } from "@/types"
 
 type EmployeeForm = {
   id: string
@@ -18,6 +18,7 @@ const emptyForm: EmployeeForm = { id: "", firstName: "", lastName: "", email: ""
 
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState<Employee[]>([])
+  const [search, setSearch] = useState("")
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState<EmployeeForm>(emptyForm)
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -29,6 +30,17 @@ export default function EmployeesPage() {
   }
 
   useEffect(() => { fetchEmployees() }, [])
+
+  const filtered = employees.filter((emp) => {
+    const q = search.toLowerCase()
+    return (
+      String(emp.id).includes(q) ||
+      emp.firstName.toLowerCase().includes(q) ||
+      emp.lastName.toLowerCase().includes(q) ||
+      emp.email.toLowerCase().includes(q) ||
+      emp.phone.includes(q)
+    )
+  })
 
   function openAdd() {
     setForm(emptyForm)
@@ -52,12 +64,10 @@ export default function EmployeesPage() {
 
   async function handleSubmit() {
     setError(null)
-
     if (!form.firstName || !form.lastName || !form.email || !form.phone) {
       setError("All fields are required.")
       return
     }
-
     if (editingId === null && !form.id) {
       setError("Employee ID is required.")
       return
@@ -95,26 +105,33 @@ export default function EmployeesPage() {
 
   return (
     <div className="p-8">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Employees</h1>
         <button onClick={openAdd} className="bg-blue-500 text-white px-4 py-2 rounded">
           + Add Employee
         </button>
       </div>
 
+      <input
+        type="text"
+        placeholder="Search by name, ID, email, or phone..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="border rounded p-2 w-full mb-4"
+      />
+
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-gray-100">
             <th className="border p-2 text-left">ID</th>
-            <th className="border p-2 text-left">First Name</th>
-            <th className="border p-2 text-left">Last Name</th>
+            <th className="border p-2 text-left">Name</th>
             <th className="border p-2 text-left">Email</th>
             <th className="border p-2 text-left">Phone</th>
             <th className="border p-2 text-left"></th>
           </tr>
         </thead>
         <tbody>
-          {employees.map((emp) => (
+          {filtered.map((emp) => (
             <tr key={emp.id} className="hover:bg-gray-50">
               <td className="border p-2">{emp.id}</td>
               <td className="border p-2">
@@ -133,19 +150,18 @@ export default function EmployeesPage() {
         </tbody>
       </table>
 
+      {filtered.length === 0 && (
+        <p className="text-gray-500 text-sm mt-4">No employees found.</p>
+      )}
+
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md flex flex-col gap-4">
             <h2 className="text-xl font-bold">{editingId !== null ? "Edit Employee" : "Add Employee"}</h2>
             {error && <p className="text-red-500 text-sm">{error}</p>}
             {editingId === null && (
-              <input
-                type="number"
-                placeholder="Employee ID"
-                value={form.id}
-                onChange={(e) => setForm({ ...form, id: e.target.value })}
-                className="border rounded p-2"
-              />
+              <input type="number" placeholder="Employee ID" value={form.id}
+                onChange={(e) => setForm({ ...form, id: e.target.value })} className="border rounded p-2" />
             )}
             <input type="text" placeholder="First Name" value={form.firstName}
               onChange={(e) => setForm({ ...form, firstName: e.target.value })} className="border rounded p-2" />
