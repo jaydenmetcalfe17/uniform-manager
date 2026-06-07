@@ -5,10 +5,12 @@ import { NextResponse } from "next/server"
 
 export async function GET(
   request: Request,
-  { params }: { params: { code: string } }
+  { params }: { params: Promise<{ code: string }> }
 ) {
+  const { code } = await params  // await the params
+
   const item = await db.item.findUnique({
-    where: { code: params.code },
+    where: { code: code },
     include: { catalog: true },
   })
 
@@ -16,7 +18,6 @@ export async function GET(
     return NextResponse.json({ error: "Item not found" }, { status: 404 })
   }
 
-  // Check if there's an active (not returned) signout for this item
   const activeSignOut = await db.signOut.findFirst({
     where: {
       itemId: item.id,
