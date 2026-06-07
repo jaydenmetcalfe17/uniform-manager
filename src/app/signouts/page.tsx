@@ -107,7 +107,7 @@ export default function SignOutsPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Sign Outs</h1>
         <button onClick={() => setShowAll(!showAll)} className="border px-4 py-2 rounded text-sm">
-          {showAll ? "Show Active Only" : "Show All"}
+          {showAll ? "Show Signed Out Only" : "Show All"}
         </button>
       </div>
 
@@ -121,7 +121,7 @@ export default function SignOutsPage() {
             <th className="border p-2 text-left">Signed Out</th>
             <th className="border p-2 text-left">Signed In</th>
             <th className="border p-2 text-left">Status</th>
-            <th className="border p-2 text-left">Actions</th>
+            <th className="border p-2 text-left"></th>
           </tr>
         </thead>
         <tbody>
@@ -135,7 +135,7 @@ export default function SignOutsPage() {
               <td className="border p-2">{s.signedInAt ? formatDate(s.signedInAt) : "—"}</td>
               <td className="border p-2">
                 <span className={`text-sm font-medium ${s.returned ? "text-green-600" : "text-orange-500"}`}>
-                  {s.returned ? "Returned" : "Active"}
+                  {s.returned ? "Returned" : "Signed Out"}
                 </span>
               </td>
               <td className="border p-2 flex gap-2">

@@ -98,7 +98,7 @@ export default function ItemsPage() {
             <th className="border p-2 text-left">Code</th>
             <th className="border p-2 text-left">Piece</th>
             <th className="border p-2 text-left">Size</th>
-            <th className="border p-2 text-left">Actions</th>
+            <th className="border p-2 text-left"></th>
           </tr>
         </thead>
         <tbody>

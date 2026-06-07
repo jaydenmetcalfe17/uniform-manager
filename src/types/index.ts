@@ -15,11 +15,20 @@ export type CatalogueEntry = {
   piece: string
 }
 
-export type Item = {
+export type ActiveSignOut = {
+  id: number
+  employee: Employee
+}
+
+export type ItemBase = {
   id: number
   code: string
   size: Size
   catalogue: CatalogueEntry
+}
+
+export type Item = ItemBase & {
+  signOuts?: ActiveSignOut[]
 }
 
 export type SignOut = {
@@ -31,15 +40,9 @@ export type SignOut = {
   signedInAt: string | null
 }
 
-export type SignOutWithDetails = {
-  id: number
-  employeeId: number
-  itemId: number
-  signedOutAt: string
-  returned: boolean
-  signedInAt: string | null
+export type SignOutWithDetails = SignOut & {
   employee: Employee
-  item: Item
+  item: ItemBase
 }
 
 export type ScannedItem = {

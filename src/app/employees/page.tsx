@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from "react"
 import type { Employee } from "@/types"
+import Link from "next/link"
 
 type EmployeeForm = {
   id: string
@@ -109,15 +110,18 @@ export default function EmployeesPage() {
             <th className="border p-2 text-left">Last Name</th>
             <th className="border p-2 text-left">Email</th>
             <th className="border p-2 text-left">Phone</th>
-            <th className="border p-2 text-left">Actions</th>
+            <th className="border p-2 text-left"></th>
           </tr>
         </thead>
         <tbody>
           {employees.map((emp) => (
             <tr key={emp.id} className="hover:bg-gray-50">
               <td className="border p-2">{emp.id}</td>
-              <td className="border p-2">{emp.firstName}</td>
-              <td className="border p-2">{emp.lastName}</td>
+              <td className="border p-2">
+                <Link href={`/employees/${emp.id}`} className="text-blue-500 hover:underline">
+                  {emp.firstName} {emp.lastName}
+                </Link>
+              </td>
               <td className="border p-2">{emp.email}</td>
               <td className="border p-2">{emp.phone}</td>
               <td className="border p-2 flex gap-2">
