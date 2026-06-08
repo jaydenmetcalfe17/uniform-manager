@@ -1,19 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-
-type Employee = {
-  id: number
-  firstName: string
-  lastName: string
-}
-
-type ScannedItem = {
-  itemId: number
-  code: string
-  size: string
-  piece: string
-}
+import { FaTrashAlt } from "react-icons/fa"
+import type { Employee, ScannedItem } from "@/types"
 
 export default function SignOutForm() {
   const [employees, setEmployees] = useState<Employee[]>([])
@@ -24,7 +13,6 @@ export default function SignOutForm() {
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
-  // Fetch employees on page load
   useEffect(() => {
     async function fetchEmployees() {
       const res = await fetch("/api/employees")
@@ -34,7 +22,6 @@ export default function SignOutForm() {
     fetchEmployees()
   }, [])
 
-  // Handle barcode scan on Enter key
   async function handleItemCodeKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key !== "Enter") return
     e.preventDefault()
@@ -45,35 +32,33 @@ export default function SignOutForm() {
     const res = await fetch(`/api/items/code/${itemCode.trim()}`)
 
     if (!res.ok) {
-        setError(`No item found with code "${itemCode}"`)
-        setItemCode("")
-        return
+      setError(`No item found with code "${itemCode}"`)
+      setItemCode("")
+      return
     }
 
     const item = await res.json()
 
-    // Prevent duplicate scans in current session
     if (scannedItems.find((i) => i.itemId === item.id)) {
-        setError("This item has already been scanned.")
-        setItemCode("")
-        return
+      setError("This item has already been scanned.")
+      setItemCode("")
+      return
     }
 
-    // Check if item is already signed out in the database
     if (item.isSignedOut) {
-        setError(`"${item.catalogue.piece} (${item.size})" is already signed out to someone. It must be returned before signing out again.`)
-        setItemCode("")
-        return
+      setError(`"${item.catalogue.piece} (${item.size})" is already signed out to someone. It must be returned before signing out again.`)
+      setItemCode("")
+      return
     }
 
     setScannedItems((prev) => [
-        ...prev,
-        {
+      ...prev,
+      {
         itemId: item.id,
         code: item.code,
         size: item.size,
         piece: item.catalogue.piece,
-        },
+      },
     ])
     setItemCode("")
   }
@@ -87,67 +72,66 @@ export default function SignOutForm() {
     setSuccess(false)
 
     if (!selectedEmployeeId) {
-        setSubmitError("Please select an employee before signing out.")
-        return
+      setSubmitError("Please select an employee before signing out.")
+      return
     }
 
     if (scannedItems.length === 0) {
-        setSubmitError("Please scan at least one item.")
-        return
+      setSubmitError("Please scan at least one item.")
+      return
     }
 
-    // Double-check all items are still available before creating any signouts
     const res = await fetch("/api/signouts/check", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ itemIds: scannedItems.map((i) => i.itemId) }),
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ itemIds: scannedItems.map((i) => i.itemId) }),
     })
 
     const { alreadySignedOut } = await res.json()
 
     if (alreadySignedOut.length > 0) {
-        setSubmitError(
+      setSubmitError(
         `The following items are already signed out and must be removed: ${alreadySignedOut.join(", ")}`
-        )
-        return
+      )
+      return
     }
 
-    // All clear — create signouts
     for (const item of scannedItems) {
-        await fetch("/api/signouts", {
+      await fetch("/api/signouts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            employeeId: Number(selectedEmployeeId),
-            itemId: item.itemId,
-            returned: false,
+          employeeId: Number(selectedEmployeeId),
+          itemId: item.itemId,
+          returned: false,
         }),
-        })
+      })
     }
 
     setScannedItems([])
     setSelectedEmployeeId("")
     setSuccess(true)
-    }
+  }
 
   return (
     <div className="flex flex-col gap-4 w-full max-w-md">
+      <h1>Sign Out</h1>
 
-      {/* Employee Dropdown */}
       <select
         value={selectedEmployeeId}
         onChange={(e) => setSelectedEmployeeId(e.target.value)}
         className="border rounded p-2"
       >
         <option value="">Select an employee...</option>
-        {employees.map((emp) => (
-          <option key={emp.id} value={emp.id}>
-            {emp.firstName} {emp.lastName}
-          </option>
+        {[...employees]
+          .sort((a, b) => a.lastName.localeCompare(b.lastName) || a.firstName.localeCompare(b.firstName))
+          .map((emp) => (
+            <option key={emp.id} value={emp.id}>
+              {emp.firstName} {emp.lastName}
+            </option>
         ))}
       </select>
 
-      {/* Barcode Input */}
       <input
         type="text"
         placeholder="Scan item barcode..."
@@ -157,10 +141,8 @@ export default function SignOutForm() {
         className="border rounded p-2"
       />
 
-      {/* Scan error */}
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && <p className="text-wmsc-red text-sm">{error}</p>}
 
-      {/* Scanned Items List */}
       {scannedItems.length > 0 && (
         <ul className="border rounded p-2 flex flex-col gap-2">
           {scannedItems.map((item) => (
@@ -168,25 +150,29 @@ export default function SignOutForm() {
               <span>{item.piece} — {item.size} ({item.code})</span>
               <button
                 onClick={() => removeItem(item.itemId)}
-                className="text-red-500 text-sm ml-4"
+                className="text-wmsc-red text-sm ml-4"
               >
-                Remove
+                <span className="text-lg hover:text-gray-500"><FaTrashAlt /></span>
               </button>
             </li>
           ))}
         </ul>
       )}
 
-      {/* Submit error */}
-      {submitError && <p className="text-red-500 text-sm">{submitError}</p>}
-
-      {/* Success message */}
+      {submitError && <p className="text-wmsc-red text-sm">{submitError}</p>}
       {success && <p className="text-green-500 text-sm">Items signed out successfully!</p>}
 
-      {/* Sign Out Button */}
       <button
         onClick={handleSubmit}
-        className="bg-blue-300 rounded p-2"
+        className="
+          bg-wmsc-blue hover:bg-wmsc-blue-hover
+          text-white
+          px-4 py-2 rounded
+          shadow-[0_4px_0_0_#000c1f]
+          active:translate-y-1
+          active:shadow-[0_1px_0_0_#000c1f]
+          transition-all duration-100
+        "
       >
         Sign Out Items
       </button>

@@ -3,6 +3,10 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  --wmsc-red: #e0232f;
+  --wmsc-blue: #002655;
+  --wmsc-blue-hover: #0062CC;
 }
 
 @theme inline {
@@ -10,6 +14,10 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --color-wmsc-red: var(--wmsc-red);
+  --color-wmsc-blue: var(--wmsc-blue);
+  --color-wmsc-blue-hover: var(--wmsc-blue-hover);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +30,5 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }

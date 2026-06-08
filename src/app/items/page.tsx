@@ -4,6 +4,9 @@
 
 import { useState, useEffect } from "react"
 import { Size } from "@/generated/prisma"
+import { FaTrashAlt } from "react-icons/fa";
+import { MdEdit } from "react-icons/md";
+import { IoMdAdd } from "react-icons/io";
 import type { Item, CatalogueEntry } from "@/types"
 
 type ItemForm = { catalogueId: string; size: string; code: string }
@@ -98,14 +101,27 @@ export default function ItemsPage() {
     <div className="p-8">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Items</h1>
-        <button onClick={openAdd} className="bg-blue-500 text-white px-4 py-2 rounded">
-          + Add Item
+        <button
+          onClick={openAdd}
+          className="
+            flex items-center gap-2
+            bg-wmsc-blue hover:bg-wmsc-blue-hover
+            text-white
+            px-4 py-2 rounded
+            shadow-[0_4px_0_0_#000c1f]
+            active:translate-y-1
+            active:shadow-[0_1px_0_0_#000c1f]
+            transition-all duration-100
+          "
+        >
+          <IoMdAdd />
+          Add Item
         </button>
       </div>
 
       <input
         type="text"
-        placeholder="Search by code, piece, size, or employee..."
+        placeholder="Search by item..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="border rounded p-2 w-full mb-4"
@@ -114,12 +130,12 @@ export default function ItemsPage() {
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-gray-100">
-            <th className="border p-2 text-left">ID</th>
-            <th className="border p-2 text-left">Code</th>
-            <th className="border p-2 text-left">Piece</th>
-            <th className="border p-2 text-left">Size</th>
-            <th className="border p-2 text-left">Signed Out By</th>
-            <th className="border p-2 text-left"></th>
+            <th className="p-2 text-left">ID</th>
+            <th className="p-2 text-left">Barcode</th>
+            <th className="p-2 text-left">Piece</th>
+            <th className="p-2 text-left">Size</th>
+            <th className="p-2 text-left">Signed Out By</th>
+            <th className="p-2 text-left"></th>
           </tr>
         </thead>
         <tbody>
@@ -127,18 +143,18 @@ export default function ItemsPage() {
             const activeSignOut = item.signOuts?.[0]
             return (
               <tr key={item.id} className="hover:bg-gray-50">
-                <td className="border p-2">{item.id}</td>
-                <td className="border p-2">{item.code}</td>
-                <td className="border p-2">{item.catalogue?.piece ?? "—"}</td>
-                <td className="border p-2">{item.size}</td>
-                <td className="border p-2">
+                <td className="p-2">{item.id}</td>
+                <td className="p-2">{item.code}</td>
+                <td className="p-2">{item.catalogue?.piece ?? "—"}</td>
+                <td className="p-2">{item.size}</td>
+                <td className="p-2">
                   {activeSignOut
                     ? `${activeSignOut.employee.firstName} ${activeSignOut.employee.lastName}`
                     : "—"}
                 </td>
-                <td className="border p-2 flex gap-2">
-                  <button onClick={() => openEdit(item)} className="text-blue-500 text-sm">Edit</button>
-                  <button onClick={() => handleDelete(item.id)} className="text-red-500 text-sm">Delete</button>
+                <td className="p-2 flex gap-2">
+                  <button onClick={() => openEdit(item)} className="text-wmsc-blue text-sm"><span className="text-lg hover:text-wmsc-blue-hover"><MdEdit /></span></button>
+                  <button onClick={() => handleDelete(item.id)} className="text-wmsc-red text-sm"><span className="text-lg hover:text-gray-500"><FaTrashAlt /></span></button>
                 </td>
               </tr>
             )
@@ -154,12 +170,14 @@ export default function ItemsPage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md flex flex-col gap-4">
             <h2 className="text-xl font-bold">{editingId !== null ? "Edit Item" : "Add Item"}</h2>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {error && <p className="text-wmsc-red text-sm">{error}</p>}
             <select value={form.catalogueId} onChange={(e) => setForm({ ...form, catalogueId: e.target.value })}
               className="border rounded p-2">
               <option value="">Select a catalogue piece...</option>
-              {catalogue.map((c) => (
-                <option key={c.id} value={c.id}>{c.piece}</option>
+              {[...catalogue]
+                .sort((a, b) => a.piece.localeCompare(b.piece))
+                .map((c) => (
+                  <option key={c.id} value={c.id}>{c.piece}</option>
               ))}
             </select>
             <select value={form.size} onChange={(e) => setForm({ ...form, size: e.target.value })}
@@ -169,11 +187,38 @@ export default function ItemsPage() {
                 <option key={s} value={s}>{s}</option>
               ))}
             </select>
-            <input type="text" placeholder="Item code" value={form.code}
+            <input type="text" placeholder="Item barcode" value={form.code}
               onChange={(e) => setForm({ ...form, code: e.target.value })} className="border rounded p-2" />
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 border rounded">Cancel</button>
-              <button onClick={handleSubmit} className="px-4 py-2 bg-blue-500 text-white rounded">
+              <button 
+                onClick={() => setShowModal(false)} 
+                className="
+                    flex items-center gap-2
+                    border
+                    border-wmsc-red
+                    hover:bg-wmsc-red
+                    px-4 py-2 rounded
+                    shadow-[0_4px_0_0_#000c1f]
+                    active:translate-y-1
+                    active:shadow-[0_1px_0_0_#000c1f]
+                    transition-all duration-100
+                  "
+                >
+                    Cancel
+              </button>
+              <button 
+                onClick={handleSubmit} 
+                className="
+                    flex items-center gap-2
+                    bg-wmsc-blue hover:bg-wmsc-blue-hover
+                    text-white
+                    px-4 py-2 rounded
+                    shadow-[0_4px_0_0_#000c1f]
+                    active:translate-y-1
+                    active:shadow-[0_1px_0_0_#000c1f]
+                    transition-all duration-100
+                  "
+                >
                 {editingId !== null ? "Save" : "Add"}
               </button>
             </div>

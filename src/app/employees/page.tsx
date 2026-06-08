@@ -4,6 +4,9 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { FaTrashAlt } from "react-icons/fa";
+import { MdEdit } from "react-icons/md";
+import { IoMdAdd } from "react-icons/io";
 import type { Employee } from "@/types"
 
 type EmployeeForm = {
@@ -107,14 +110,27 @@ export default function EmployeesPage() {
     <div className="p-8">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Employees</h1>
-        <button onClick={openAdd} className="bg-blue-500 text-white px-4 py-2 rounded">
-          + Add Employee
+        <button
+          onClick={openAdd}
+          className="
+            flex items-center gap-2
+            bg-wmsc-blue hover:bg-wmsc-blue-hover
+            text-white
+            px-4 py-2 rounded
+            shadow-[0_4px_0_0_#000c1f]
+            active:translate-y-1
+            active:shadow-[0_1px_0_0_#000c1f]
+            transition-all duration-100
+          "
+        >
+          <IoMdAdd />
+          Add Employee
         </button>
       </div>
 
       <input
         type="text"
-        placeholder="Search by name, ID, email, or phone..."
+        placeholder="Search employees..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="border rounded p-2 w-full mb-4"
@@ -123,27 +139,27 @@ export default function EmployeesPage() {
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-gray-100">
-            <th className="border p-2 text-left">ID</th>
-            <th className="border p-2 text-left">Name</th>
-            <th className="border p-2 text-left">Email</th>
-            <th className="border p-2 text-left">Phone</th>
-            <th className="border p-2 text-left"></th>
+            <th className="p-2 text-left">ID</th>
+            <th className="p-2 text-left">Name</th>
+            <th className="p-2 text-left">Email</th>
+            <th className="p-2 text-left">Phone</th>
+            <th className="p-2 text-left"></th>
           </tr>
         </thead>
         <tbody>
           {filtered.map((emp) => (
             <tr key={emp.id} className="hover:bg-gray-50">
-              <td className="border p-2">{emp.id}</td>
-              <td className="border p-2">
-                <Link href={`/employees/${emp.id}`} className="text-blue-500 hover:underline">
+              <td className="p-2">{emp.id}</td>
+              <td className="p-2">
+                <Link href={`/employees/${emp.id}`} className="text-wmsc-blue hover:underline">
                   {emp.firstName} {emp.lastName}
                 </Link>
               </td>
-              <td className="border p-2">{emp.email}</td>
-              <td className="border p-2">{emp.phone}</td>
-              <td className="border p-2 flex gap-2">
-                <button onClick={() => openEdit(emp)} className="text-blue-500 text-sm">Edit</button>
-                <button onClick={() => handleDelete(emp.id)} className="text-red-500 text-sm">Delete</button>
+              <td className="p-2">{emp.email}</td>
+              <td className="p-2">{emp.phone}</td>
+              <td className="p-2 flex gap-2">
+                <button onClick={() => openEdit(emp)} className="text-wmsc-blue text-sm"><span className="text-lg hover:text-wmsc-blue-hover"><MdEdit /></span></button>
+                <button onClick={() => handleDelete(emp.id)} className="text-wmsc-red text-sm"><span className="text-lg hover:text-gray-500"><FaTrashAlt /></span></button>
               </td>
             </tr>
           ))}
@@ -158,7 +174,7 @@ export default function EmployeesPage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md flex flex-col gap-4">
             <h2 className="text-xl font-bold">{editingId !== null ? "Edit Employee" : "Add Employee"}</h2>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {error && <p className="text-wmsc-red text-sm">{error}</p>}
             {editingId === null && (
               <input type="number" placeholder="Employee ID" value={form.id}
                 onChange={(e) => setForm({ ...form, id: e.target.value })} className="border rounded p-2" />
@@ -172,8 +188,35 @@ export default function EmployeesPage() {
             <input type="tel" placeholder="Phone" value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })} className="border rounded p-2" />
             <div className="flex gap-2 justify-end">
-              <button onClick={() => setShowModal(false)} className="px-4 py-2 border rounded">Cancel</button>
-              <button onClick={handleSubmit} className="px-4 py-2 bg-blue-500 text-white rounded">
+              <button 
+                onClick={() => setShowModal(false)} 
+                className="
+                    flex items-center gap-2
+                    border
+                    border-wmsc-red
+                    hover:bg-wmsc-red
+                    px-4 py-2 rounded
+                    shadow-[0_4px_0_0_#000c1f]
+                    active:translate-y-1
+                    active:shadow-[0_1px_0_0_#000c1f]
+                    transition-all duration-100
+                  "
+                >
+                    Cancel
+              </button>
+              <button 
+                onClick={handleSubmit} 
+                className="
+                    flex items-center gap-2
+                    bg-wmsc-blue hover:bg-wmsc-blue-hover
+                    text-white
+                    px-4 py-2 rounded
+                    shadow-[0_4px_0_0_#000c1f]
+                    active:translate-y-1
+                    active:shadow-[0_1px_0_0_#000c1f]
+                    transition-all duration-100
+                  "
+                >
                 {editingId !== null ? "Save" : "Add"}
               </button>
             </div>

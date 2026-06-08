@@ -51,3 +51,16 @@ export type ScannedItem = {
   size: string
   piece: string
 }
+
+export type ScannedSignInItem = {
+  code: string
+  itemId?: number
+  piece?: string
+  size?: string
+  error?: string
+}
+
+export type SignInResult = {
+  succeeded: ScannedSignInItem[]
+  failed: ScannedSignInItem[]
+}
