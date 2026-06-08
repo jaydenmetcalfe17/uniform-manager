@@ -252,15 +252,16 @@ export default function EmployeeDetailPage() {
           <button
             onClick={handleDeleteEmployee}
             className="
-              flex items-center gap-2
-              border border-wmsc-red text-wmsc-red
-              hover:bg-wmsc-red hover:text-white
-              px-4 py-2 rounded
-              shadow-[0_4px_0_0_#000c1f]
-              active:translate-y-1 active:shadow-[0_1px_0_0_#000c1f]
-              transition-all duration-100
+                flex items-center gap-2
+                bg-wmsc-red text-white
+                hover:bg-wmsc-red-hover hover:text-white
+                px-4 py-2 rounded
+                shadow-[0_4px_0_0_#000c1f]
+                active:translate-y-1
+                active:shadow-[0_1px_0_0_#000c1f]
+                transition-all duration-100
             "
-          >
+           >
             <FaTrashAlt size={14} />
             Delete
           </button>
@@ -304,8 +305,8 @@ export default function EmployeeDetailPage() {
                     >
                       Sign In
                     </button>
-                    <button onClick={() => handleDelete(s.id)} className="text-wmsc-red text-sm">
-                      <span className="text-lg hover:text-gray-500"><FaTrashAlt /></span>
+                    <button onClick={() => handleDelete(s.id)}>
+                      <span className="text-lg hover:text-wmsc-red-hover"><FaTrashAlt /></span>
                     </button>
                   </td>
                 </tr>
@@ -341,8 +342,8 @@ export default function EmployeeDetailPage() {
                   <td className="p-2">{formatDate(s.signedOutAt)}</td>
                   <td className="p-2">{s.signedInAt ? formatDate(s.signedInAt) : "—"}</td>
                   <td className="p-2">
-                    <button onClick={() => handleDelete(s.id)} className="text-wmsc-red text-sm">
-                      <span className="text-lg hover:text-gray-500"><FaTrashAlt /></span>
+                    <button onClick={() => handleDelete(s.id)}>
+                      <span className="text-lg hover:text-wmsc-red-hover"><FaTrashAlt /></span>
                     </button>
                   </td>
                 </tr>
@@ -370,12 +371,13 @@ export default function EmployeeDetailPage() {
               <button
                 onClick={() => setShowEditModal(false)}
                 className="
-                  flex items-center gap-2
-                  border border-wmsc-red hover:bg-wmsc-red hover:text-white
-                  px-4 py-2 rounded
-                  shadow-[0_4px_0_0_#000c1f]
-                  active:translate-y-1 active:shadow-[0_1px_0_0_#000c1f]
-                  transition-all duration-100
+                    text-sm bg-wmsc-red text-white
+                    hover:bg-wmsc-red-hover hover:text-white
+                    px-4 py-2 rounded
+                    shadow-[0_4px_0_0_#000c1f]
+                    active:translate-y-1
+                    active:shadow-[0_1px_0_0_#000c1f]
+                    transition-all duration-100
                 "
               >
                 Cancel
@@ -437,12 +439,13 @@ export default function EmployeeDetailPage() {
               <button
                 onClick={() => setShowSignOutModal(false)}
                 className="
-                  flex items-center gap-2
-                  border border-wmsc-red hover:bg-wmsc-red hover:text-white
-                  px-4 py-2 rounded
-                  shadow-[0_4px_0_0_#000c1f]
-                  active:translate-y-1 active:shadow-[0_1px_0_0_#000c1f]
-                  transition-all duration-100
+                    text-sm bg-wmsc-red text-white
+                    hover:bg-wmsc-red-hover hover:text-white
+                    px-4 py-2 rounded
+                    shadow-[0_4px_0_0_#000c1f]
+                    active:translate-y-1
+                    active:shadow-[0_1px_0_0_#000c1f]
+                    transition-all duration-100
                 "
               >
                 Cancel

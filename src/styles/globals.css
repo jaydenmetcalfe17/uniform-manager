@@ -6,6 +6,7 @@
 
   --wmsc-red: #e0232f;
   --wmsc-blue: #002655;
+  --wmsc-red-hover: #e65a62;
   --wmsc-blue-hover: #0062CC;
 }
 
@@ -18,6 +19,7 @@
   --color-wmsc-red: var(--wmsc-red);
   --color-wmsc-blue: var(--wmsc-blue);
   --color-wmsc-blue-hover: var(--wmsc-blue-hover);
+  --color-wmsc-red-hover: var(--wmsc-red-hover);
 }
 
 @media (prefers-color-scheme: dark) {

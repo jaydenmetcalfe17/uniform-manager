@@ -116,8 +116,8 @@ export default function CataloguePage() {
               <td className="p-2">{c.id}</td>
               <td className="p-2">{c.piece}</td>
               <td className="p-2 flex gap-2">
-                <button onClick={() => openEdit(c)} className="text-wmsc-blue text-sm"><span className="text-lg hover:text-wmsc-blue-hover"><MdEdit /></span></button>
-                <button onClick={() => handleDelete(c.id)} className="text-wmsc-red text-sm"><span className="text-lg hover:text-gray-500"><FaTrashAlt /></span></button>
+                <button onClick={() => openEdit(c)}><span className="text-lg text-wmsc-blue hover:text-wmsc-blue-hover"><MdEdit /></span></button>
+                <button onClick={() => handleDelete(c.id)}><span className="text-lg text-wmsc-red hover:text-wmsc-red-hover"><FaTrashAlt /></span></button>
               </td>
             </tr>
           ))}
@@ -139,16 +139,14 @@ export default function CataloguePage() {
               <button 
                 onClick={() => setShowModal(false)} 
                 className="
-                    flex items-center gap-2
-                    border
-                    border-wmsc-red
-                    hover:bg-wmsc-red
-                    px-4 py-2 rounded
-                    shadow-[0_4px_0_0_#000c1f]
-                    active:translate-y-1
-                    active:shadow-[0_1px_0_0_#000c1f]
-                    transition-all duration-100
-                  "
+                  text-sm bg-wmsc-red text-white
+                  hover:bg-wmsc-red-hover hover:text-white
+                  px-4 py-2 rounded
+                  shadow-[0_4px_0_0_#000c1f]
+                  active:translate-y-1
+                  active:shadow-[0_1px_0_0_#000c1f]
+                  transition-all duration-100
+                "
                 >
                     Cancel
               </button>

@@ -152,7 +152,7 @@ export default function SignOutForm() {
                 onClick={() => removeItem(item.itemId)}
                 className="text-wmsc-red text-sm ml-4"
               >
-                <span className="text-lg hover:text-gray-500"><FaTrashAlt /></span>
+                <span className="text-lg hover:text-wmsc-red-hover"><FaTrashAlt /></span>
               </button>
             </li>
           ))}
