@@ -77,3 +77,16 @@ export type PasswordResetToken = {
   expiresAt: string
   used: boolean
 }
+
+export type ScannedSignOutItem = {
+  code: string
+  itemId?: number
+  piece?: string
+  size?: string
+  error?: string
+}
+
+export type SignOutResult = {
+  succeeded: ScannedSignOutItem[]
+  failed: ScannedSignOutItem[]
+}
