@@ -1,4 +1,4 @@
-//src/app/reset-password/page.tsx
+//src/app/reset-password/page.disabled.tsx
 
 "use client"
 
