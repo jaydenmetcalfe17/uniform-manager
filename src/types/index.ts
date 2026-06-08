@@ -64,3 +64,16 @@ export type SignInResult = {
   succeeded: ScannedSignInItem[]
   failed: ScannedSignInItem[]
 }
+
+export type Password = {
+  id: number
+  hash: string
+  updatedAt: string
+}
+
+export type PasswordResetToken = {
+  id: number
+  token: string
+  expiresAt: string
+  used: boolean
+}

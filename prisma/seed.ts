@@ -1,4 +1,5 @@
 import { PrismaClient, Prisma } from "../src/generated/prisma";
+import bcrypt from "bcryptjs"
 
 const prisma = new PrismaClient();
 
@@ -39,7 +40,7 @@ const catalogueData: Prisma.CatalogueCreateInput[] = [
 const itemData: Prisma.ItemCreateInput[] = [
   {
     catalogue: {
-      connect: { piece: "Red shell jacket" }  // connects to existing Catalogue record
+      connect: { piece: "Red shell jacket" }
     },
     size: "S",
     code: "24888S19"
@@ -48,14 +49,34 @@ const itemData: Prisma.ItemCreateInput[] = [
 
 async function main() {
     for (const e of employeeData) {
-        await prisma.employee.create({ data: e });
+        await prisma.employee.upsert({
+            where: { id: e.id },
+            update: {},
+            create: e,
+        });
     }
     for (const c of catalogueData) {
-        await prisma.catalogue.create({ data: c });
+        await prisma.catalogue.upsert({
+            where: { piece: c.piece },
+            update: {},
+            create: c,
+        });
     }
     for (const i of itemData) {
-        await prisma.item.create({ data: i });
+        await prisma.item.upsert({
+            where: { code: i.code },
+            update: {},
+            create: i,
+        });
     }
+
+    const existingPassword = await prisma.password.findFirst()
+    if (!existingPassword) {
+        const hash = await bcrypt.hash(process.env.INITIAL_PASSWORD!, 12)
+        await prisma.password.create({ data: { hash } })
+        console.log("Password seeded.")
+    }
+
     console.log("Seeding done.");
 }
 
