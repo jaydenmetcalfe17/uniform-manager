@@ -4,8 +4,20 @@
 
 import { useState, useEffect } from "react"
 import { FaTrashAlt } from "react-icons/fa"
-import type { Employee, ScannedItem, ScannedSignOutItem, SignOutResult } from "@/types"
+import type { Employee, ScannedItem } from "@/types"
 
+type ScannedSignOutItem = {
+  code: string
+  itemId?: number
+  piece?: string
+  size?: string
+  error?: string
+}
+
+type SignOutResult = {
+  succeeded: ScannedSignOutItem[]
+  failed: ScannedSignOutItem[]
+}
 
 export default function SignOutForm() {
   const [employees, setEmployees] = useState<Employee[]>([])
@@ -227,3 +239,15 @@ export default function SignOutForm() {
         className="
           bg-wmsc-blue hover:bg-wmsc-blue-hover
           text-white
+          px-4 py-2 rounded
+          shadow-[0_4px_0_0_#000c1f]
+          active:translate-y-1
+          active:shadow-[0_1px_0_0_#000c1f]
+          transition-all duration-100
+        "
+      >
+        Sign Out Items
+      </button>
+    </div>
+  )
+}
