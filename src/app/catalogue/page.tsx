@@ -3,9 +3,9 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { FaTrashAlt } from "react-icons/fa";
-import { MdEdit } from "react-icons/md";
-import { IoMdAdd } from "react-icons/io";
+import { FaTrashAlt } from "react-icons/fa"
+import { MdEdit } from "react-icons/md"
+import { IoMdAdd } from "react-icons/io"
 import type { CatalogueEntry } from "@/types"
 
 export default function CataloguePage() {
@@ -73,7 +73,7 @@ export default function CataloguePage() {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Catalogue</h1>
         <button
@@ -82,7 +82,8 @@ export default function CataloguePage() {
             flex items-center gap-2
             bg-wmsc-blue hover:bg-wmsc-blue-hover
             text-white
-            px-4 py-2 rounded
+            px-3 py-2 md:px-4 md:py-2 rounded
+            text-sm md:text-base
             shadow-[0_4px_0_0_#000c1f]
             active:translate-y-1
             active:shadow-[0_1px_0_0_#000c1f]
@@ -90,7 +91,8 @@ export default function CataloguePage() {
           "
         >
           <IoMdAdd />
-          Add Piece
+          <span className="hidden sm:inline">Add Piece</span>
+          <span className="sm:hidden">Add</span>
         </button>
       </div>
 
@@ -99,70 +101,97 @@ export default function CataloguePage() {
         placeholder="Search catalogue..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="border rounded p-2 w-full mb-4" //boarder
+        className="border rounded p-2 w-full mb-4"
       />
 
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="p-2 text-left">ID</th>
-            <th className="p-2 text-left">Piece</th>
-            <th className="p-2 text-left"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {filtered.map((c) => (
-            <tr key={c.id} className="hover:bg-gray-50">
-              <td className="p-2">{c.id}</td>
-              <td className="p-2">{c.piece}</td>
-              <td className="p-2 flex gap-2">
-                <button onClick={() => openEdit(c)}><span className="text-lg text-wmsc-blue hover:text-wmsc-blue-hover"><MdEdit /></span></button>
-                <button onClick={() => handleDelete(c.id)}><span className="text-lg text-wmsc-red hover:text-wmsc-red-hover"><FaTrashAlt /></span></button>
-              </td>
+      {/* Desktop table */}
+      <div className="hidden md:block">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="p-2 text-left">ID</th>
+              <th className="p-2 text-left">Piece</th>
+              <th className="p-2 text-left"></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filtered.map((c) => (
+              <tr key={c.id} className="hover:bg-gray-50">
+                <td className="p-2">{c.id}</td>
+                <td className="p-2">{c.piece}</td>
+                <td className="p-2 flex gap-2">
+                  <button onClick={() => openEdit(c)}>
+                    <span className="text-lg text-wmsc-blue hover:text-wmsc-blue-hover"><MdEdit /></span>
+                  </button>
+                  <button onClick={() => handleDelete(c.id)}>
+                    <span className="text-lg text-wmsc-red"><FaTrashAlt /></span>
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="md:hidden flex flex-col gap-3">
+        {filtered.map((c) => (
+          <div key={c.id} className="bg-white border rounded-lg p-4 flex justify-between items-center">
+            <div className="flex flex-col gap-1">
+              <span className="text-xs text-gray-400">ID: {c.id}</span>
+              <span className="font-medium">{c.piece}</span>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => openEdit(c)}>
+                <span className="text-xl text-wmsc-blue"><MdEdit /></span>
+              </button>
+              <button onClick={() => handleDelete(c.id)}>
+                <span className="text-xl text-wmsc-red"><FaTrashAlt /></span>
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
 
       {filtered.length === 0 && (
         <p className="text-gray-500 text-sm mt-4">No catalogue entries found.</p>
       )}
 
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 w-full max-w-md flex flex-col gap-4">
             <h2 className="text-xl font-bold">{editingId !== null ? "Edit Piece" : "Add Catalogue Piece"}</h2>
             {error && <p className="text-wmsc-red text-sm">{error}</p>}
             <input type="text" placeholder="Piece name" value={piece}
               onChange={(e) => setPiece(e.target.value)} className="border rounded p-2" />
             <div className="flex gap-2 justify-end">
-              <button 
-                onClick={() => setShowModal(false)} 
+              <button
+                onClick={() => setShowModal(false)}
                 className="
                   text-sm bg-wmsc-red text-white
-                  hover:bg-wmsc-red-hover hover:text-white
+                  hover:bg-wmsc-red-hover
                   px-4 py-2 rounded
                   shadow-[0_4px_0_0_#000c1f]
                   active:translate-y-1
                   active:shadow-[0_1px_0_0_#000c1f]
                   transition-all duration-100
                 "
-                >
-                    Cancel
+              >
+                Cancel
               </button>
-              <button 
-                onClick={handleSubmit} 
+              <button
+                onClick={handleSubmit}
                 className="
-                    flex items-center gap-2
-                    bg-wmsc-blue hover:bg-wmsc-blue-hover
-                    text-white
-                    px-4 py-2 rounded
-                    shadow-[0_4px_0_0_#000c1f]
-                    active:translate-y-1
-                    active:shadow-[0_1px_0_0_#000c1f]
-                    transition-all duration-100
-                  "
-                >
+                  flex items-center gap-2
+                  bg-wmsc-blue hover:bg-wmsc-blue-hover
+                  text-white
+                  px-4 py-2 rounded
+                  shadow-[0_4px_0_0_#000c1f]
+                  active:translate-y-1
+                  active:shadow-[0_1px_0_0_#000c1f]
+                  transition-all duration-100
+                "
+              >
                 {editingId !== null ? "Save" : "Add"}
               </button>
             </div>

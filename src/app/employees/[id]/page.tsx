@@ -32,12 +32,10 @@ export default function EmployeeDetailPage() {
   const router = useRouter()
   const [employee, setEmployee] = useState<EmployeeWithSignOuts | null>(null)
 
-  // Edit modal
   const [showEditModal, setShowEditModal] = useState(false)
   const [editForm, setEditForm] = useState<EmployeeForm>({ firstName: "", lastName: "", email: "", phone: "" })
   const [editError, setEditError] = useState<string | null>(null)
 
-  // Sign out modal
   const [showSignOutModal, setShowSignOutModal] = useState(false)
   const [itemCode, setItemCode] = useState("")
   const [scannedItems, setScannedItems] = useState<ScannedItem[]>([])
@@ -51,8 +49,6 @@ export default function EmployeeDetailPage() {
   }
 
   useEffect(() => { fetchEmployee() }, [id])
-
-  // --- Sign In / Delete signout ---
 
   async function handleSignIn(signOutId: number) {
     if (!confirm("Mark this item as returned?")) return
@@ -69,8 +65,6 @@ export default function EmployeeDetailPage() {
     await fetch(`/api/signouts/${signOutId}`, { method: "DELETE" })
     fetchEmployee()
   }
-
-  // --- Edit employee ---
 
   function openEdit() {
     if (!employee) return
@@ -106,15 +100,11 @@ export default function EmployeeDetailPage() {
     fetchEmployee()
   }
 
-  // --- Delete employee ---
-
   async function handleDeleteEmployee() {
     if (!confirm("Are you sure you want to delete this employee? This cannot be undone.")) return
     await fetch(`/api/employees/${id}`, { method: "DELETE" })
     router.push("/employees")
   }
-
-  // --- Sign out from employee page ---
 
   function openSignOut() {
     setScannedItems([])
@@ -206,10 +196,10 @@ export default function EmployeeDetailPage() {
   const history = employee.signOuts.filter((s) => s.returned)
 
   return (
-    <div className="p-8 flex flex-col gap-8">
+    <div className="p-4 md:p-8 flex flex-col gap-8">
 
       {/* Employee Info */}
-      <div className="flex justify-between items-start">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
         <div>
           <h1 className="text-2xl font-bold mb-2">
             {employee.firstName} {employee.lastName}
@@ -220,7 +210,7 @@ export default function EmployeeDetailPage() {
             <p>Phone: {employee.phone}</p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <button
             onClick={openSignOut}
             className="
@@ -252,16 +242,15 @@ export default function EmployeeDetailPage() {
           <button
             onClick={handleDeleteEmployee}
             className="
-                flex items-center gap-2
-                bg-wmsc-red text-white
-                hover:bg-wmsc-red-hover hover:text-white
-                px-4 py-2 rounded
-                shadow-[0_4px_0_0_#000c1f]
-                active:translate-y-1
-                active:shadow-[0_1px_0_0_#000c1f]
-                transition-all duration-100
+              flex items-center gap-2
+              bg-wmsc-red text-white
+              hover:bg-wmsc-red-hover
+              px-4 py-2 rounded
+              shadow-[0_4px_0_0_#000c1f]
+              active:translate-y-1 active:shadow-[0_1px_0_0_#000c1f]
+              transition-all duration-100
             "
-           >
+          >
             <FaTrashAlt size={14} />
             Delete
           </button>
@@ -274,45 +263,81 @@ export default function EmployeeDetailPage() {
         {activeSignOuts.length === 0 ? (
           <p className="text-gray-500 text-sm">No items currently signed out.</p>
         ) : (
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="p-2 text-left">Item</th>
-                <th className="p-2 text-left">Size</th>
-                <th className="p-2 text-left">Code</th>
-                <th className="p-2 text-left">Signed Out</th>
-                <th className="p-2 text-left"></th>
-              </tr>
-            </thead>
-            <tbody>
+          <>
+            {/* Desktop table */}
+            <div className="hidden md:block">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="p-2 text-left">Item</th>
+                    <th className="p-2 text-left">Size</th>
+                    <th className="p-2 text-left">Code</th>
+                    <th className="p-2 text-left">Signed Out</th>
+                    <th className="p-2 text-left"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {activeSignOuts.map((s) => (
+                    <tr key={s.id} className="hover:bg-gray-50">
+                      <td className="p-2">{s.item.catalogue.piece}</td>
+                      <td className="p-2">{s.item.size}</td>
+                      <td className="p-2">{s.item.code}</td>
+                      <td className="p-2">{formatDate(s.signedOutAt)}</td>
+                      <td className="p-2 flex gap-2">
+                        <button
+                          onClick={() => handleSignIn(s.id)}
+                          className="
+                            flex items-center gap-2
+                            text-white bg-wmsc-blue hover:bg-wmsc-blue-hover
+                            px-4 py-2 rounded
+                            shadow-[0_4px_0_0_#000c1f]
+                            active:translate-y-1 active:shadow-[0_1px_0_0_#000c1f]
+                            transition-all duration-100
+                          "
+                        >
+                          Sign In
+                        </button>
+                        <button onClick={() => handleDelete(s.id)}>
+                          <span className="text-lg text-wmsc-red"><FaTrashAlt /></span>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile cards */}
+            <div className="md:hidden flex flex-col gap-3">
               {activeSignOuts.map((s) => (
-                <tr key={s.id} className="hover:bg-gray-50">
-                  <td className="p-2">{s.item.catalogue.piece}</td>
-                  <td className="p-2">{s.item.size}</td>
-                  <td className="p-2">{s.item.code}</td>
-                  <td className="p-2">{formatDate(s.signedOutAt)}</td>
-                  <td className="p-2 flex gap-2">
-                    <button
-                      onClick={() => handleSignIn(s.id)}
-                      className="
-                        flex items-center gap-2
-                        text-white bg-wmsc-blue hover:bg-wmsc-blue-hover
-                        px-4 py-2 rounded
-                        shadow-[0_4px_0_0_#000c1f]
-                        active:translate-y-1 active:shadow-[0_1px_0_0_#000c1f]
-                        transition-all duration-100
-                      "
-                    >
-                      Sign In
-                    </button>
+                <div key={s.id} className="bg-white border rounded-lg p-4 flex flex-col gap-2">
+                  <div className="flex justify-between items-start">
+                    <div className="flex flex-col gap-1">
+                      <span className="font-medium">{s.item.catalogue.piece}</span>
+                      <span className="text-sm text-gray-600">{s.item.size} — {s.item.code}</span>
+                      <span className="text-xs text-gray-400">{formatDate(s.signedOutAt)}</span>
+                    </div>
                     <button onClick={() => handleDelete(s.id)}>
-                      <span className="text-lg hover:text-wmsc-red-hover"><FaTrashAlt /></span>
+                      <span className="text-lg text-wmsc-red"><FaTrashAlt /></span>
                     </button>
-                  </td>
-                </tr>
+                  </div>
+                  <button
+                    onClick={() => handleSignIn(s.id)}
+                    className="
+                      flex items-center justify-center gap-2
+                      text-white bg-wmsc-blue hover:bg-wmsc-blue-hover
+                      px-4 py-2 rounded w-full
+                      shadow-[0_4px_0_0_#000c1f]
+                      active:translate-y-1 active:shadow-[0_1px_0_0_#000c1f]
+                      transition-all duration-100
+                    "
+                  >
+                    Sign In
+                  </button>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </>
         )}
       </div>
 
@@ -322,40 +347,62 @@ export default function EmployeeDetailPage() {
         {history.length === 0 ? (
           <p className="text-gray-500 text-sm">No sign in history.</p>
         ) : (
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="p-2 text-left">Item</th>
-                <th className="p-2 text-left">Size</th>
-                <th className="p-2 text-left">Code</th>
-                <th className="p-2 text-left">Signed Out</th>
-                <th className="p-2 text-left">Signed In</th>
-                <th className="p-2 text-left"></th>
-              </tr>
-            </thead>
-            <tbody>
+          <>
+            {/* Desktop table */}
+            <div className="hidden md:block">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="p-2 text-left">Item</th>
+                    <th className="p-2 text-left">Size</th>
+                    <th className="p-2 text-left">Code</th>
+                    <th className="p-2 text-left">Signed Out</th>
+                    <th className="p-2 text-left">Signed In</th>
+                    <th className="p-2 text-left"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {history.map((s) => (
+                    <tr key={s.id} className="hover:bg-gray-50">
+                      <td className="p-2">{s.item.catalogue.piece}</td>
+                      <td className="p-2">{s.item.size}</td>
+                      <td className="p-2">{s.item.code}</td>
+                      <td className="p-2">{formatDate(s.signedOutAt)}</td>
+                      <td className="p-2">{s.signedInAt ? formatDate(s.signedInAt) : "—"}</td>
+                      <td className="p-2">
+                        <button onClick={() => handleDelete(s.id)}>
+                          <span className="text-lg text-wmsc-red"><FaTrashAlt /></span>
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile cards */}
+            <div className="md:hidden flex flex-col gap-3">
               {history.map((s) => (
-                <tr key={s.id} className="hover:bg-gray-50">
-                  <td className="p-2">{s.item.catalogue.piece}</td>
-                  <td className="p-2">{s.item.size}</td>
-                  <td className="p-2">{s.item.code}</td>
-                  <td className="p-2">{formatDate(s.signedOutAt)}</td>
-                  <td className="p-2">{s.signedInAt ? formatDate(s.signedInAt) : "—"}</td>
-                  <td className="p-2">
-                    <button onClick={() => handleDelete(s.id)}>
-                      <span className="text-lg hover:text-wmsc-red-hover"><FaTrashAlt /></span>
-                    </button>
-                  </td>
-                </tr>
+                <div key={s.id} className="bg-white border rounded-lg p-4 flex justify-between items-start">
+                  <div className="flex flex-col gap-1">
+                    <span className="font-medium">{s.item.catalogue.piece}</span>
+                    <span className="text-sm text-gray-600">{s.item.size} — {s.item.code}</span>
+                    <span className="text-xs text-gray-400">Out: {formatDate(s.signedOutAt)}</span>
+                    <span className="text-xs text-gray-400">In: {s.signedInAt ? formatDate(s.signedInAt) : "—"}</span>
+                  </div>
+                  <button onClick={() => handleDelete(s.id)}>
+                    <span className="text-lg text-wmsc-red"><FaTrashAlt /></span>
+                  </button>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </>
         )}
       </div>
 
       {/* Edit Employee Modal */}
       {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 w-full max-w-md flex flex-col gap-4">
             <h2 className="text-xl font-bold">Edit Employee</h2>
             {editError && <p className="text-wmsc-red text-sm">{editError}</p>}
@@ -371,13 +418,12 @@ export default function EmployeeDetailPage() {
               <button
                 onClick={() => setShowEditModal(false)}
                 className="
-                    text-sm bg-wmsc-red text-white
-                    hover:bg-wmsc-red-hover hover:text-white
-                    px-4 py-2 rounded
-                    shadow-[0_4px_0_0_#000c1f]
-                    active:translate-y-1
-                    active:shadow-[0_1px_0_0_#000c1f]
-                    transition-all duration-100
+                  text-sm bg-wmsc-red text-white
+                  hover:bg-wmsc-red-hover
+                  px-4 py-2 rounded
+                  shadow-[0_4px_0_0_#000c1f]
+                  active:translate-y-1 active:shadow-[0_1px_0_0_#000c1f]
+                  transition-all duration-100
                 "
               >
                 Cancel
@@ -402,7 +448,7 @@ export default function EmployeeDetailPage() {
 
       {/* Sign Out Modal */}
       {showSignOutModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 w-full max-w-md flex flex-col gap-4">
             <h2 className="text-xl font-bold">
               Sign Out — {employee.firstName} {employee.lastName}
@@ -423,7 +469,7 @@ export default function EmployeeDetailPage() {
               <ul className="border rounded p-2 flex flex-col gap-2">
                 {scannedItems.map((item) => (
                   <li key={item.itemId} className="flex justify-between items-center">
-                    <span>{item.piece} — {item.size} ({item.code})</span>
+                    <span className="text-sm">{item.piece} — {item.size} ({item.code})</span>
                     <button onClick={() => removeScannedItem(item.itemId)} className="text-wmsc-red ml-4">
                       <span className="text-lg"><FaTrashAlt /></span>
                     </button>
@@ -439,13 +485,12 @@ export default function EmployeeDetailPage() {
               <button
                 onClick={() => setShowSignOutModal(false)}
                 className="
-                    text-sm bg-wmsc-red text-white
-                    hover:bg-wmsc-red-hover hover:text-white
-                    px-4 py-2 rounded
-                    shadow-[0_4px_0_0_#000c1f]
-                    active:translate-y-1
-                    active:shadow-[0_1px_0_0_#000c1f]
-                    transition-all duration-100
+                  text-sm bg-wmsc-red text-white
+                  hover:bg-wmsc-red-hover
+                  px-4 py-2 rounded
+                  shadow-[0_4px_0_0_#000c1f]
+                  active:translate-y-1 active:shadow-[0_1px_0_0_#000c1f]
+                  transition-all duration-100
                 "
               >
                 Cancel

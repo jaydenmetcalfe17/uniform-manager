@@ -61,12 +61,12 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 gap-6">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 gap-6 px-4">
       <Image src={wmscLogo} alt="WMSC Logo" className="h-16 w-auto" />
       <h1 className="text-2xl font-bold text-wmsc-blue">Reset Password</h1>
 
       {success ? (
-        <p className="text-green-600 text-sm">Password reset successfully! Redirecting to login...</p>
+        <p className="text-green-600 text-sm text-center">Password reset successfully! Redirecting to login...</p>
       ) : (
         <div className="flex flex-col gap-3 w-full max-w-sm">
           <input

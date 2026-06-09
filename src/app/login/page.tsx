@@ -39,7 +39,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 gap-6">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 gap-6 px-4">
       <Image src={wmscLogo} alt="WMSC Logo" className="h-16 w-auto" />
       <h1 className="text-2xl font-bold text-wmsc-blue">Uniform Manager</h1>
 
@@ -56,17 +56,15 @@ export default function LoginPage() {
         {error && <p className="text-wmsc-red text-sm">{error}</p>}
 
         {/* UNCOMMENT WHEN SETTING UP FORGOT PASSWORD FUNCTIONALITY!!
-        
         <button
-            onClick={async () => {
-                await fetch("/api/auth/forgot-password", { method: "POST" })
-                alert("If an account exists, a reset link has been sent to info@wmsc.info")
-            }}
-            className="text-sm text-gray-500 hover:text-wmsc-blue text-left"
-            >
-            Forgot password?
-            </button>
-
+          onClick={async () => {
+            await fetch("/api/auth/forgot-password", { method: "POST" })
+            alert("If an account exists, a reset link has been sent to info@wmsc.info")
+          }}
+          className="text-sm text-gray-500 hover:text-wmsc-blue text-left"
+        >
+          Forgot password?
+        </button>
         */}
 
         <button
