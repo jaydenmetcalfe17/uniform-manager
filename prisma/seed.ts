@@ -1,3 +1,4 @@
+
 import { PrismaClient, Prisma } from "../src/generated/prisma";
 import bcrypt from "bcryptjs"
 
@@ -5,7 +6,6 @@ const prisma = new PrismaClient();
 
 const employeeData: Prisma.EmployeeCreateInput[] = [
     {
-        id: 191,
         firstName: "Jayden",
         lastName: "Metcalfe",
         email: "jayden10.9@gmail.com",
@@ -38,23 +38,32 @@ const catalogueData: Prisma.CatalogueCreateInput[] = [
 ];
 
 const itemData: Prisma.ItemCreateInput[] = [
-  {
-    catalogue: {
-      connect: { piece: "Red shell jacket" }
-    },
-    size: "S",
-    code: "24888S19"
-  }
+    {
+        catalogue: {
+            connect: { piece: "Red shell jacket" }
+        },
+        size: "S",
+        code: "24888S19"
+    }
 ];
 
 async function main() {
+    // Seed employees
     for (const e of employeeData) {
-        await prisma.employee.upsert({
-            where: { id: e.id },
-            update: {},
-            create: e,
-        });
+        if (e.email) {
+            await prisma.employee.upsert({
+                where: { email: e.email },
+                update: {},
+                create: e,
+            });
+        } else {
+            await prisma.employee.create({
+                data: e,
+            });
+        }
     }
+
+    // Seed catalogue
     for (const c of catalogueData) {
         await prisma.catalogue.upsert({
             where: { piece: c.piece },
@@ -62,6 +71,8 @@ async function main() {
             create: c,
         });
     }
+
+    // Seed items
     for (const i of itemData) {
         await prisma.item.upsert({
             where: { code: i.code },
@@ -70,7 +81,9 @@ async function main() {
         });
     }
 
+    // Seed password
     const existingPassword = await prisma.password.findFirst()
+
     if (!existingPassword) {
         const hash = await bcrypt.hash(process.env.INITIAL_PASSWORD!, 12)
         await prisma.password.create({ data: { hash } })
