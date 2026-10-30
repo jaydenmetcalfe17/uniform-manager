@@ -71,8 +71,8 @@ export default function EmployeeDetailPage() {
     setEditForm({
       firstName: employee.firstName,
       lastName: employee.lastName,
-      email: employee.email,
-      phone: employee.phone,
+      email: employee.email ?? "",
+      phone: employee.phone ?? "",
     })
     setEditError(null)
     setShowEditModal(true)
@@ -80,15 +80,21 @@ export default function EmployeeDetailPage() {
 
   async function handleEditSubmit() {
     setEditError(null)
-    if (!editForm.firstName || !editForm.lastName || !editForm.email || !editForm.phone) {
-      setEditError("All fields are required.")
+
+    if (!editForm.firstName.trim() || !editForm.lastName.trim()) {
+      setEditError("First and last name are required.")
       return
     }
 
     const res = await fetch(`/api/employees/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(editForm)
+      body: JSON.stringify({
+        firstName: editForm.firstName.trim(),
+        lastName: editForm.lastName.trim(),
+        email: editForm.email.trim() || null,
+        phone: editForm.phone.trim() || null,
+      })
     })
 
     if (!res.ok) {
@@ -206,8 +212,8 @@ export default function EmployeeDetailPage() {
           </h1>
           <div className="text-gray-600 flex flex-col gap-1">
             <p>ID: {employee.id}</p>
-            <p>Email: {employee.email}</p>
-            <p>Phone: {employee.phone}</p>
+            <p>Email: {employee.email || "—"}</p>
+            <p>Phone: {employee.phone || "—"}</p>
           </div>
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -410,9 +416,9 @@ export default function EmployeeDetailPage() {
               onChange={(e) => setEditForm({ ...editForm, firstName: e.target.value })} className="border rounded p-2" />
             <input type="text" placeholder="Last Name" value={editForm.lastName}
               onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })} className="border rounded p-2" />
-            <input type="email" placeholder="Email" value={editForm.email}
+            <input type="email" placeholder="Email (optional)" value={editForm.email}
               onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} className="border rounded p-2" />
-            <input type="tel" placeholder="Phone" value={editForm.phone}
+            <input type="tel" placeholder="Phone (optional)" value={editForm.phone}
               onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} className="border rounded p-2" />
             <div className="flex gap-2 justify-end">
               <button

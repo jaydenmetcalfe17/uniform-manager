@@ -10,14 +10,13 @@ import { IoMdAdd } from "react-icons/io"
 import type { Employee } from "@/types"
 
 type EmployeeForm = {
-  id: string
   firstName: string
   lastName: string
   email: string
   phone: string
 }
 
-const emptyForm: EmployeeForm = { id: "", firstName: "", lastName: "", email: "", phone: "" }
+const emptyForm: EmployeeForm = { firstName: "", lastName: "", email: "", phone: "" }
 
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState<Employee[]>([])
@@ -40,8 +39,8 @@ export default function EmployeesPage() {
       String(emp.id).includes(q) ||
       emp.firstName.toLowerCase().includes(q) ||
       emp.lastName.toLowerCase().includes(q) ||
-      emp.email.toLowerCase().includes(q) ||
-      emp.phone.includes(q)
+      (emp.email ?? "").toLowerCase().includes(q) ||
+      (emp.phone ?? "").includes(q)
     )
   })
 
@@ -54,11 +53,10 @@ export default function EmployeesPage() {
 
   function openEdit(emp: Employee) {
     setForm({
-      id: String(emp.id),
       firstName: emp.firstName,
       lastName: emp.lastName,
-      email: emp.email,
-      phone: emp.phone,
+      email: emp.email ?? "",
+      phone: emp.phone ?? "",
     })
     setEditingId(emp.id)
     setError(null)
@@ -67,32 +65,31 @@ export default function EmployeesPage() {
 
   async function handleSubmit() {
     setError(null)
-    if (!form.firstName || !form.lastName || !form.email || !form.phone) {
-      setError("All fields are required.")
-      return
-    }
-    if (editingId === null && !form.id) {
-      setError("Employee ID is required.")
+
+    if (!form.firstName.trim() || !form.lastName.trim()) {
+      setError("First and last name are required.")
       return
     }
 
-    const url = editingId !== null ? `/api/employees/${editingId}` : "/api/employees"
+    const url = editingId !== null
+      ? `/api/employees/${editingId}`
+      : "/api/employees"
+
     const method = editingId !== null ? "PUT" : "POST"
 
     const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        id: Number(form.id),
-        firstName: form.firstName,
-        lastName: form.lastName,
-        email: form.email,
-        phone: form.phone,
+        firstName: form.firstName.trim(),
+        lastName: form.lastName.trim(),
+        email: form.email.trim() || null,
+        phone: form.phone.trim() || null,
       })
     })
 
     if (!res.ok) {
-      setError("Failed to save employee. ID or email may already exist.")
+      setError("Failed to save employee. Email may already be in use.")
       return
     }
 
@@ -159,8 +156,8 @@ export default function EmployeesPage() {
                     {emp.firstName} {emp.lastName}
                   </Link>
                 </td>
-                <td className="p-2">{emp.email}</td>
-                <td className="p-2">{emp.phone}</td>
+                <td className="p-2">{emp.email || "—"}</td>
+                <td className="p-2">{emp.phone || "—"}</td>
                 <td className="p-2 flex gap-2">
                   <button onClick={() => openEdit(emp)}>
                     <span className="text-lg text-wmsc-blue hover:text-wmsc-blue-hover"><MdEdit /></span>
@@ -184,8 +181,8 @@ export default function EmployeesPage() {
               <Link href={`/employees/${emp.id}`} className="font-medium text-wmsc-blue hover:underline">
                 {emp.firstName} {emp.lastName}
               </Link>
-              <span className="text-sm text-gray-600">{emp.email}</span>
-              <span className="text-sm text-gray-600">{emp.phone}</span>
+              <span className="text-sm text-gray-600">{emp.email || "—"}</span>
+              <span className="text-sm text-gray-600">{emp.phone || "—"}</span>
             </div>
             <div className="flex gap-3">
               <button onClick={() => openEdit(emp)}>
@@ -208,17 +205,13 @@ export default function EmployeesPage() {
           <div className="bg-white rounded-lg p-6 w-full max-w-md flex flex-col gap-4">
             <h2 className="text-xl font-bold">{editingId !== null ? "Edit Employee" : "Add Employee"}</h2>
             {error && <p className="text-wmsc-red text-sm">{error}</p>}
-            {editingId === null && (
-              <input type="number" placeholder="Employee ID" value={form.id}
-                onChange={(e) => setForm({ ...form, id: e.target.value })} className="border rounded p-2" />
-            )}
             <input type="text" placeholder="First Name" value={form.firstName}
               onChange={(e) => setForm({ ...form, firstName: e.target.value })} className="border rounded p-2" />
             <input type="text" placeholder="Last Name" value={form.lastName}
               onChange={(e) => setForm({ ...form, lastName: e.target.value })} className="border rounded p-2" />
-            <input type="email" placeholder="Email" value={form.email}
+            <input type="email" placeholder="Email (optional)" value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })} className="border rounded p-2" />
-            <input type="tel" placeholder="Phone" value={form.phone}
+            <input type="tel" placeholder="Phone (optional)" value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })} className="border rounded p-2" />
             <div className="flex gap-2 justify-end">
               <button

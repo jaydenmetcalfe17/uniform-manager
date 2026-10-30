@@ -13,14 +13,15 @@ export async function GET() {
 // POST a new employee
 export async function POST(request: Request) {
   const body = await request.json()
+
   const employee = await db.employee.create({
     data: {
-      id: body.id,
       firstName: body.firstName,
       lastName: body.lastName,
-      email: body.email,
-      phone: body.phone,
+      email: body.email || null,
+      phone: body.phone || null,
     }
   })
+
   return NextResponse.json(employee)
 }

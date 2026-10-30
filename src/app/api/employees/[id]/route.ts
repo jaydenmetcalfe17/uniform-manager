@@ -38,8 +38,8 @@ export async function PUT(
     data: {
       firstName: body.firstName,
       lastName: body.lastName,
-      email: body.email,
-      phone: body.phone,
+      email: body.email || null,
+      phone: body.phone || null,
     }
   })
   return NextResponse.json(employee)
