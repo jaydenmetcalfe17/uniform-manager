@@ -208,8 +208,13 @@ export default function SignInForm() {
 
         <button
           type="submit"
-          className="bg-wmsc-blue hover:bg-wmsc-blue-hover text-white px-4 py-2 rounded"
-        >
+          className="flex items-center gap-2
+                  bg-wmsc-blue hover:bg-wmsc-blue-hover text-white 
+                  px-4 py-2 rounded 
+                  shadow-[0_4px_0_0_#000c1f]
+                  active:translate-y-1 active:shadow-[0_1px_0_0_#000c1f]
+                  transition-all duration-100"
+          >
           Add
         </button>
       </form>
