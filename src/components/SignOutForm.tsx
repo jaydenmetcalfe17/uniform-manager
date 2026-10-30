@@ -1,10 +1,10 @@
-//src/components/SignOutForm.tsx
+// src/components/SignOutForm.tsx
 
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { FaTrashAlt } from "react-icons/fa"
-import type { Employee, ScannedItem } from "@/types"
+import type { Employee } from "@/types"
 
 type ScannedSignOutItem = {
   code: string
@@ -29,6 +29,8 @@ export default function SignOutForm() {
   const [result, setResult] = useState<SignOutResult | null>(null)
   const [submitted, setSubmitted] = useState(false)
 
+  const itemCodeInputRef = useRef<HTMLInputElement>(null)
+
   useEffect(() => {
     async function fetchEmployees() {
       const res = await fetch("/api/employees")
@@ -38,50 +40,71 @@ export default function SignOutForm() {
     fetchEmployees()
   }, [])
 
-  async function handleItemCodeKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key !== "Enter") return
+  function refocusInput() {
+    itemCodeInputRef.current?.focus()
+  }
+
+  async function handleItemCodeSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+
+    const code = itemCode.trim()
+
+    if (!code) return
+
     setScanError(null)
+    setSubmitError(null)
     setResult(null)
     setSubmitted(false)
 
-    if (!itemCode.trim()) return
-
-    if (scannedItems.find((i) => i.code === itemCode.trim())) {
+    if (scannedItems.find((i) => i.code === code)) {
       setScanError("This item has already been scanned.")
       setItemCode("")
+      refocusInput()
       return
     }
 
-    const res = await fetch(`/api/items/code/${itemCode.trim()}`)
+    const res = await fetch(`/api/items/code/${code}`)
 
     if (!res.ok) {
-      setScannedItems((prev) => [...prev, { code: itemCode.trim(), error: "Item not found" }])
+      setScannedItems((prev) => [
+        ...prev,
+        { code, error: "Item not found" }
+      ])
       setItemCode("")
+      refocusInput()
       return
     }
 
     const item = await res.json()
 
     if (item.isSignedOut) {
-      setScannedItems((prev) => [...prev, {
-        code: itemCode.trim(),
-        itemId: item.id,
-        piece: item.catalogue.piece,
-        size: item.size,
-        error: "Already signed out to someone",
-      }])
+      setScannedItems((prev) => [
+        ...prev,
+        {
+          code,
+          itemId: item.id,
+          piece: item.catalogue.piece,
+          size: item.size,
+          error: "Already signed out to someone",
+        }
+      ])
       setItemCode("")
+      refocusInput()
       return
     }
 
-    setScannedItems((prev) => [...prev, {
-      code: itemCode.trim(),
-      itemId: item.id,
-      piece: item.catalogue.piece,
-      size: item.size,
-    }])
+    setScannedItems((prev) => [
+      ...prev,
+      {
+        code,
+        itemId: item.id,
+        piece: item.catalogue.piece,
+        size: item.size,
+      }
+    ])
+
     setItemCode("")
+    refocusInput()
   }
 
   function removeItem(code: string) {
@@ -144,7 +167,10 @@ export default function SignOutForm() {
     setResult({ succeeded, failed })
     setSubmitted(true)
     setScannedItems([])
+
     if (succeeded.length > 0) setSelectedEmployeeId("")
+    
+    refocusInput()
   }
 
   const goodItems = scannedItems.filter((i) => !i.error)
@@ -161,7 +187,10 @@ export default function SignOutForm() {
       >
         <option value="">Select an employee...</option>
         {[...employees]
-          .sort((a, b) => a.lastName.localeCompare(b.lastName) || a.firstName.localeCompare(b.firstName))
+          .sort((a, b) =>
+            a.lastName.localeCompare(b.lastName) ||
+            a.firstName.localeCompare(b.firstName)
+          )
           .map((emp) => (
             <option key={emp.id} value={emp.id}>
               {emp.firstName} {emp.lastName}
@@ -169,33 +198,54 @@ export default function SignOutForm() {
           ))}
       </select>
 
-      <input
-        type="text"
-        placeholder="Scan item barcode..."
-        value={itemCode}
-        onChange={(e) => setItemCode(e.target.value)}
-        onKeyDown={handleItemCodeKeyDown}
-        className="border rounded p-2"
-      />
+      <form onSubmit={handleItemCodeSubmit} className="flex gap-2">
+        <input
+          ref={itemCodeInputRef}
+          type="text"
+          placeholder="Scan item barcode..."
+          value={itemCode}
+          onChange={(e) => setItemCode(e.target.value)}
+          className="border rounded p-2 flex-1"
+          autoFocus
+        />
 
-      {scanError && <p className="text-wmsc-red text-sm">{scanError}</p>}
+        <button
+          type="submit"
+          className="bg-wmsc-blue hover:bg-wmsc-blue-hover text-white px-4 py-2 rounded"
+        >
+          Add
+        </button>
+      </form>
+
+      {scanError && (
+        <p className="text-wmsc-red text-sm">{scanError}</p>
+      )}
 
       {scannedItems.length > 0 && (
         <ul className="border rounded p-2 flex flex-col gap-2">
           {goodItems.map((item) => (
             <li key={item.code} className="flex justify-between items-center">
               <span>{item.piece} — {item.size} ({item.code})</span>
-              <button onClick={() => removeItem(item.code)} className="text-wmsc-red ml-4">
+              <button
+                onClick={() => removeItem(item.code)}
+                className="text-wmsc-red ml-4"
+              >
                 <span className="text-lg"><FaTrashAlt /></span>
               </button>
             </li>
           ))}
+
           {badItems.map((item) => (
             <li key={item.code} className="flex justify-between items-center">
               <span className="text-wmsc-red text-sm">
-                {item.piece ? `${item.piece} — ${item.size} (${item.code})` : item.code} — {item.error}
+                {item.piece
+                  ? `${item.piece} — ${item.size} (${item.code})`
+                  : item.code} — {item.error}
               </span>
-              <button onClick={() => removeItem(item.code)} className="text-wmsc-red ml-4">
+              <button
+                onClick={() => removeItem(item.code)}
+                className="text-wmsc-red ml-4"
+              >
                 <span className="text-lg"><FaTrashAlt /></span>
               </button>
             </li>
@@ -203,13 +253,17 @@ export default function SignOutForm() {
         </ul>
       )}
 
-      {submitError && <p className="text-wmsc-red text-sm">{submitError}</p>}
+      {submitError && (
+        <p className="text-wmsc-red text-sm">{submitError}</p>
+      )}
 
       {submitted && result && (
         <div className="flex flex-col gap-3">
           {result.succeeded.length > 0 && (
             <div>
-              <p className="text-green-600 text-sm font-medium mb-1">Successfully signed out:</p>
+              <p className="text-green-600 text-sm font-medium mb-1">
+                Successfully signed out:
+              </p>
               <ul className="text-sm flex flex-col gap-1">
                 {result.succeeded.map((item) => (
                   <li key={item.code} className="text-green-600">
@@ -219,13 +273,18 @@ export default function SignOutForm() {
               </ul>
             </div>
           )}
+
           {result.failed.length > 0 && (
             <div>
-              <p className="text-wmsc-red text-sm font-medium mb-1">Could not sign out:</p>
+              <p className="text-wmsc-red text-sm font-medium mb-1">
+                Could not sign out:
+              </p>
               <ul className="text-sm flex flex-col gap-1">
                 {result.failed.map((item) => (
                   <li key={item.code} className="text-wmsc-red">
-                    ✗ {item.piece ? `${item.piece} — ${item.size} (${item.code})` : item.code} — {item.error}
+                    ✗ {item.piece
+                      ? `${item.piece} — ${item.size} (${item.code})`
+                      : item.code} — {item.error}
                   </li>
                 ))}
               </ul>
