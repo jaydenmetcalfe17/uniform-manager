@@ -2,7 +2,7 @@
 
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { FaTrashAlt } from "react-icons/fa"
 import type { ScannedSignInItem, SignInResult } from "@/types"
 
@@ -12,52 +12,118 @@ export default function SignInForm() {
   const [scanError, setScanError] = useState<string | null>(null)
   const [result, setResult] = useState<SignInResult | null>(null)
   const [submitted, setSubmitted] = useState(false)
+  const itemCodeInputRef = useRef<HTMLInputElement>(null)
 
-  async function handleItemCodeKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key !== "Enter") return
+  function refocusInput() {
+    itemCodeInputRef.current?.focus()
+  }
+
+  async function handleItemCodeSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+
+    const code = itemCode.trim()
+
+    if (!code) return
+
     setScanError(null)
     setResult(null)
     setSubmitted(false)
 
-    if (!itemCode.trim()) return
-
-    if (scannedItems.find((i) => i.code === itemCode.trim())) {
+    if (scannedItems.find((i) => i.code === code)) {
       setScanError("This item has already been scanned.")
       setItemCode("")
+      refocusInput()
       return
     }
 
-    const res = await fetch(`/api/items/code/${itemCode.trim()}`)
+    const res = await fetch(`/api/items/code/${code}`)
 
     if (!res.ok) {
-      setScannedItems((prev) => [...prev, { code: itemCode.trim(), error: "Item not found" }])
+      setScannedItems((prev) => [
+        ...prev,
+        { code, error: "Item not found" }
+      ])
       setItemCode("")
+      refocusInput()
       return
     }
 
     const item = await res.json()
 
     if (!item.isSignedOut) {
-      setScannedItems((prev) => [...prev, {
-        code: itemCode.trim(),
-        itemId: item.id,
-        piece: item.catalogue.piece,
-        size: item.size,
-        error: "Not currently signed out",
-      }])
+      setScannedItems((prev) => [
+        ...prev,
+        {
+          code,
+          itemId: item.id,
+          piece: item.catalogue.piece,
+          size: item.size,
+          error: "Not currently signed out",
+        }
+      ])
       setItemCode("")
+      refocusInput()
       return
     }
 
-    setScannedItems((prev) => [...prev, {
-      code: itemCode.trim(),
-      itemId: item.id,
-      piece: item.catalogue.piece,
-      size: item.size,
-    }])
+    setScannedItems((prev) => [
+      ...prev,
+      {
+        code,
+        itemId: item.id,
+        piece: item.catalogue.piece,
+        size: item.size,
+      }
+    ])
+
     setItemCode("")
+    refocusInput()
   }
+  // async function handleItemCodeKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+  //   if (e.key !== "Enter") return
+  //   e.preventDefault()
+  //   setScanError(null)
+  //   setResult(null)
+  //   setSubmitted(false)
+
+  //   if (!itemCode.trim()) return
+
+  //   if (scannedItems.find((i) => i.code === itemCode.trim())) {
+  //     setScanError("This item has already been scanned.")
+  //     setItemCode("")
+  //     return
+  //   }
+
+  //   const res = await fetch(`/api/items/code/${itemCode.trim()}`)
+
+  //   if (!res.ok) {
+  //     setScannedItems((prev) => [...prev, { code: itemCode.trim(), error: "Item not found" }])
+  //     setItemCode("")
+  //     return
+  //   }
+
+  //   const item = await res.json()
+
+  //   if (!item.isSignedOut) {
+  //     setScannedItems((prev) => [...prev, {
+  //       code: itemCode.trim(),
+  //       itemId: item.id,
+  //       piece: item.catalogue.piece,
+  //       size: item.size,
+  //       error: "Not currently signed out",
+  //     }])
+  //     setItemCode("")
+  //     return
+  //   }
+
+  //   setScannedItems((prev) => [...prev, {
+  //     code: itemCode.trim(),
+  //     itemId: item.id,
+  //     piece: item.catalogue.piece,
+  //     size: item.size,
+  //   }])
+  //   setItemCode("")
+  // }
 
   function removeItem(code: string) {
     setScannedItems((prev) => prev.filter((i) => i.code !== code))
@@ -121,14 +187,32 @@ export default function SignInForm() {
     <div className="flex flex-col gap-4 w-full max-w-md">
       <h1>Sign In</h1>
 
-      <input
+      {/* <input
         type="text"
         placeholder="Scan item barcode..."
         value={itemCode}
         onChange={(e) => setItemCode(e.target.value)}
         onKeyDown={handleItemCodeKeyDown}
         className="border rounded p-2"
-      />
+      /> */}
+      <form onSubmit={handleItemCodeSubmit} className="flex gap-2">
+        <input
+          ref={itemCodeInputRef}
+          type="text"
+          placeholder="Scan item barcode..."
+          value={itemCode}
+          onChange={(e) => setItemCode(e.target.value)}
+          className="border rounded p-2 flex-1"
+          autoFocus
+        />
+
+        <button
+          type="submit"
+          className="bg-wmsc-blue hover:bg-wmsc-blue-hover text-white px-4 py-2 rounded"
+        >
+          Add
+        </button>
+      </form>
 
       {scanError && <p className="text-wmsc-red text-sm">{scanError}</p>}
 
