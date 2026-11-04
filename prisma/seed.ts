@@ -43,7 +43,8 @@ const itemData: Prisma.ItemCreateInput[] = [
             connect: { piece: "Red shell jacket" }
         },
         size: "S",
-        code: "24888S19"
+        code: "24888S19",
+        condition: "Good",
     }
 ];
 

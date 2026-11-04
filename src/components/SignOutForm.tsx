@@ -4,20 +4,9 @@
 
 import { useState, useEffect, useRef } from "react"
 import { FaTrashAlt } from "react-icons/fa"
-import type { Employee } from "@/types"
+import type { Employee, ScannedSignOutItem, SignOutResult } from "@/types"
 
-type ScannedSignOutItem = {
-  code: string
-  itemId?: number
-  piece?: string
-  size?: string
-  error?: string
-}
 
-type SignOutResult = {
-  succeeded: ScannedSignOutItem[]
-  failed: ScannedSignOutItem[]
-}
 
 export default function SignOutForm() {
   const [employees, setEmployees] = useState<Employee[]>([])
@@ -85,6 +74,7 @@ export default function SignOutForm() {
           itemId: item.id,
           piece: item.catalogue.piece,
           size: item.size,
+          condition: item.condition || "",
           error: "Already signed out to someone",
         }
       ])
@@ -100,6 +90,7 @@ export default function SignOutForm() {
         itemId: item.id,
         piece: item.catalogue.piece,
         size: item.size,
+        condition: item.condition || "",
       }
     ])
 
@@ -230,7 +221,7 @@ export default function SignOutForm() {
         <ul className="border rounded p-2 flex flex-col gap-2">
           {goodItems.map((item) => (
             <li key={item.code} className="flex justify-between items-center">
-              <span>{item.piece} — {item.size} ({item.code})</span>
+              <span>{item.piece} — {item.size} ({item.code}) - {item.condition}</span>
               <button
                 onClick={() => removeItem(item.code)}
                 className="text-wmsc-red ml-4"

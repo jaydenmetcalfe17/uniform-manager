@@ -58,6 +58,7 @@ export default function SignInForm() {
           itemId: item.id,
           piece: item.catalogue.piece,
           size: item.size,
+          condition: item.condition || "",
           error: "Not currently signed out",
         }
       ])
@@ -73,6 +74,7 @@ export default function SignInForm() {
         itemId: item.id,
         piece: item.catalogue.piece,
         size: item.size,
+        condition: item.condition || "",
       }
     ])
 
@@ -226,7 +228,7 @@ export default function SignInForm() {
         <ul className="border rounded p-2 flex flex-col gap-2">
           {goodItems.map((item) => (
             <li key={item.code} className="flex justify-between items-center">
-              <span>{item.piece} — {item.size} ({item.code})</span>
+              <span>{item.piece} — {item.size} ({item.code}) - {item.condition}</span>
               <button onClick={() => removeItem(item.code)} className="text-wmsc-red ml-4">
                 <span className="text-lg"><FaTrashAlt /></span>
               </button>

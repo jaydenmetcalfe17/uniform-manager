@@ -9,8 +9,8 @@ import { MdEdit } from "react-icons/md"
 import { IoMdAdd } from "react-icons/io"
 import type { Item, CatalogueEntry } from "@/types"
 
-type ItemForm = { catalogueId: string; size: string; code: string }
-const emptyForm: ItemForm = { catalogueId: "", size: "", code: "" }
+type ItemForm = { catalogueId: string; size: string; code: string , condition: string}
+const emptyForm: ItemForm = { catalogueId: "", size: "", code: "" , condition: ""}
 
 export default function ItemsPage() {
   const [items, setItems] = useState<Item[]>([])
@@ -40,7 +40,8 @@ export default function ItemsPage() {
       item.code.toLowerCase().includes(q) ||
       item.catalogue?.piece.toLowerCase().includes(q) ||
       item.size.toLowerCase().includes(q) ||
-      (signedOutBy && `${signedOutBy.firstName} ${signedOutBy.lastName}`.toLowerCase().includes(q))
+      (signedOutBy && `${signedOutBy.firstName} ${signedOutBy.lastName}`.toLowerCase().includes(q)) ||
+      item.condition?.toLowerCase().includes(q)
     )
   })
 
@@ -56,6 +57,7 @@ export default function ItemsPage() {
       catalogueId: String(item.catalogue.id),
       size: item.size,
       code: item.code,
+      condition: item.condition ?? "",
     })
     setEditingId(item.id)
     setError(null)
@@ -69,6 +71,11 @@ export default function ItemsPage() {
       return
     }
 
+    if (form.condition === "Other") {
+      setError("Please specify the condition.")
+      return
+    }
+
     const url = editingId !== null ? `/api/items/${editingId}` : "/api/items"
     const method = editingId !== null ? "PUT" : "POST"
 
@@ -79,6 +86,7 @@ export default function ItemsPage() {
         catalogueId: Number(form.catalogueId),
         size: form.size,
         code: form.code.trim(),
+        condition: form.condition.trim() || null,
       })
     })
 
@@ -138,6 +146,7 @@ export default function ItemsPage() {
               <th className="p-2 text-left">Barcode</th>
               <th className="p-2 text-left">Piece</th>
               <th className="p-2 text-left">Size</th>
+              <th className="p-2 text-left">Condition</th>
               <th className="p-2 text-left">Signed Out By</th>
               <th className="p-2 text-left"></th>
             </tr>
@@ -151,6 +160,7 @@ export default function ItemsPage() {
                   <td className="p-2">{item.code}</td>
                   <td className="p-2">{item.catalogue?.piece ?? "—"}</td>
                   <td className="p-2">{item.size}</td>
+                  <td className="p-2">{item.condition ?? "—"}</td>
                   <td className="p-2">
                     {activeSignOut
                       ? `${activeSignOut.employee.firstName} ${activeSignOut.employee.lastName}`
@@ -180,7 +190,9 @@ export default function ItemsPage() {
               <div className="flex flex-col gap-1">
                 <span className="text-xs text-gray-400">ID: {item.id}</span>
                 <span className="font-medium">{item.catalogue?.piece ?? "—"}</span>
-                <span className="text-sm text-gray-600">{item.size} — {item.code}</span>
+                <span className="text-sm text-gray-600">
+                  {item.size} — {item.code} — {item.condition ?? "—"}
+                </span>
                 {activeSignOut && (
                   <span className="text-xs text-orange-500">
                     Signed out by {activeSignOut.employee.firstName} {activeSignOut.employee.lastName}
@@ -227,6 +239,36 @@ export default function ItemsPage() {
             </select>
             <input type="text" placeholder="Item barcode" value={form.code}
               onChange={(e) => setForm({ ...form, code: e.target.value })} className="border rounded p-2" />
+            
+            <select
+              value={
+                ["", "New", "Good", "Fair"].includes(form.condition)
+                  ? form.condition
+                  : "Other"
+              }
+              onChange={(e) =>
+                setForm({ ...form, condition: e.target.value })
+              }
+              className="border rounded p-2"
+            >
+              <option value="">Select a condition...</option>
+              <option value="New">New</option>
+              <option value="Good">Good</option>
+              <option value="Fair">Fair</option>
+              <option value="Other">Other</option>
+            </select>
+
+            {!["", "New", "Good", "Fair"].includes(form.condition) && (
+              <input
+                type="text"
+                placeholder="Specify condition..."
+                value={form.condition === "Other" ? "" : form.condition}
+                onChange={(e) =>
+                  setForm({ ...form, condition: e.target.value })
+                }
+                className="border rounded p-2"
+              />
+            )}
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setShowModal(false)}

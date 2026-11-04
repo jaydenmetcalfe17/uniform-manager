@@ -24,6 +24,7 @@ export type ItemBase = {
   id: number
   code: string
   size: Size
+  condition: string | null
   catalogue: CatalogueEntry
 }
 
@@ -50,6 +51,7 @@ export type ScannedItem = {
   code: string
   size: string
   piece: string
+  condition: string | null
 }
 
 export type ScannedSignInItem = {
@@ -57,6 +59,7 @@ export type ScannedSignInItem = {
   itemId?: number
   piece?: string
   size?: string
+  condition?: string | null
   error?: string
 }
 
@@ -83,6 +86,7 @@ export type ScannedSignOutItem = {
   itemId?: number
   piece?: string
   size?: string
+  condition?: string | null
   error?: string
 }
 

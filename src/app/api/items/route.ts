@@ -25,6 +25,7 @@ export async function POST(request: Request) {
       catalogueId: body.catalogueId,
       size: body.size,
       code: body.code,
+      condition: body.condition || "",
     }
   })
   return NextResponse.json(item)

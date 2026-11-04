@@ -152,7 +152,7 @@ export default function EmployeeDetailPage() {
 
     setScannedItems((prev) => [
       ...prev,
-      { itemId: item.id, code: item.code, size: item.size, piece: item.catalogue.piece }
+      { itemId: item.id, code: item.code, size: item.size, piece: item.catalogue.piece, condition: item.condition ?? null}
     ])
     setItemCode("")
   }
@@ -278,6 +278,7 @@ export default function EmployeeDetailPage() {
                     <th className="p-2 text-left">Item</th>
                     <th className="p-2 text-left">Size</th>
                     <th className="p-2 text-left">Code</th>
+                    <th className="p-2 text-left">Condition</th>
                     <th className="p-2 text-left">Signed Out</th>
                     <th className="p-2 text-left"></th>
                   </tr>
@@ -288,6 +289,7 @@ export default function EmployeeDetailPage() {
                       <td className="p-2">{s.item.catalogue.piece}</td>
                       <td className="p-2">{s.item.size}</td>
                       <td className="p-2">{s.item.code}</td>
+                      <td className="p-2">{s.item.condition ?? "—"}</td>
                       <td className="p-2">{formatDate(s.signedOutAt)}</td>
                       <td className="p-2 flex gap-2">
                         <button
@@ -475,7 +477,9 @@ export default function EmployeeDetailPage() {
               <ul className="border rounded p-2 flex flex-col gap-2">
                 {scannedItems.map((item) => (
                   <li key={item.itemId} className="flex justify-between items-center">
-                    <span className="text-sm">{item.piece} — {item.size} ({item.code})</span>
+                    <span className="text-sm">
+                      {item.piece} — {item.size} ({item.code}) — {item.condition ?? "—"}
+                    </span>
                     <button onClick={() => removeScannedItem(item.itemId)} className="text-wmsc-red ml-4">
                       <span className="text-lg"><FaTrashAlt /></span>
                     </button>

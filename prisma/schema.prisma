@@ -30,6 +30,7 @@ model Item {
   catalogue       Catalogue     @relation(fields: [catalogueId], references: [id])
   size          Size
   code          String      @unique
+  condition     String?
   signOuts      SignOut[]
 }
 
